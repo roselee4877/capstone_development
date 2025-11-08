@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>뉴스 추천 사이트 - 댓글</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366F1", // Indigo-500
+                        "background-light": "#F9FAFB", // Gray-50
+                        "background-dark": "#1F2937",   // Gray-800
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#374151", // Gray-700
+                        "text-light": "#111827", // Gray-900
+                        "text-dark": "#F9FAFB", // Gray-50
+                        "text-secondary-light": "#6B7280", // Gray-500
+                        "text-secondary-dark": "#D1D5DB", // Gray-300
+                        "border-light": "#E5E7EB", // Gray-200
+                        "border-dark": "#4B5563", // Gray-600
+                        "accent-jinbo": "#3B82F6", // Blue-500
+                        "accent-bosu": "#EC4899", // Pink-500
+                    },
+                    fontFamily: {
+                        display: ["Noto Sans KR", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+    <body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+        <div class="container mx-auto p-4 md:p-8">
+            <header class="flex items-center space-x-4 mb-8">
+                <div class="flex items-center space-x-4 flex-grow">
+                    <!--홈버튼-->
+                    <button class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
+                        <span class="material-icons">home</span>
+                    </button>
+                    <!--검색어창-->
+                    <div class="relative flex-grow">
+                        <input class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="검색어 입력" type="text"/>
+                        <button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
+                            <span class="material-icons">search</span>
+                        </button>
+                    </div>
+                </div>
+                <!--my버튼-->
+                <button class="ml -4 bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">MY</button>
+            </header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<main class="lg:col-span-2">
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
+<h2 class="text-xl font-bold mb-4">댓글 <span class="text-primary">1,234</span>개</h2>
+<div class="mb-6">
+<div class="flex space-x-4">
+<textarea class="w-full p-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="댓글 입력" rows="3"></textarea>
+<button class="bg-primary text-white px-6 py-2 rounded-lg self-start hover:bg-indigo-700 transition-colors">입력 버튼</button>
+</div>
+</div>
+<div class="flex items-center space-x-4 border-b border-border-light dark:border-border-dark pb-4 mb-4">
+<button class="font-bold text-primary">좋아요순</button>
+<span class="text-text-secondary-light dark:text-text-secondary-dark">|</span>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary">최신순</button>
+</div>
+<div class="space-y-6">
+<div class="flex space-x-4">
+<img alt="프로필 사진" class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCAyqUnXFWfKvOsjM9TdretglS_Hazw2t3mgAvYkyJpu3IKt9FgMeJ4dW9xQpURadmkX3H5iKoo0mAmamTn9FOtecW3V6UuQzx5AlyrToIJYXrNa9Z7M-UjR4t7E_du6ifCt6ETsKsEQ1z4S3-mJJOY92DCa0Q8hdXT4ct0QTQa6qOL4Me3KDU0lIvRYn2OqkJhRAmiJvYvJANhHu0mjIbQRxK7iq-tZ20ZwTHVjvN1_suVKZxE5OKssVXFMygFgqb20rDFYkX-Wg"/>
+<div class="flex-grow">
+<div class="flex items-center space-x-2">
+<p class="font-bold">이름</p>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">올린 시간</p>
+</div>
+<p class="mt-1">여기에 댓글 내용이 표시됩니다. 사용자가 작성한 댓글이 길어질 수도 있으므로 여러 줄로 표시될 수 있습니다.</p>
+<div class="flex items-center space-x-4 mt-2 text-sm">
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">
+<span class="material-icons text-base">thumb_up_off_alt</span>
+<span>좋아요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">좋아요</button>
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">
+<span class="material-icons text-base">thumb_down_off_alt</span>
+<span>싫어요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">싫어요</button>
+</div>
+</div>
+</div>
+<div class="flex space-x-4">
+<img alt="프로필 사진" class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWGigIf4OaxOPTCBbKqltOdZu6gdyazMsHS2dvoJ4dx5Py3pGBC-jp4TZQsH7FowcWrdYYBnRCLRNMvilRyaToxlF3Gx8OqVG_Oyi52_oQiKxjFGsU-hFSyL-s_2XzMWOFKOb5jFMX24qpEUjMDOfeLFB9G_f23tg6pAqWFUOjHRyjnoa8_xzqWBW24bSCkrDIgfvESDDS6bYR1YbWbuMsOiwP7iM87azv7YSipk0yIjGOVm2YyUN0rjo1a64LSYSDPV716o_mPGU"/>
+<div class="flex-grow">
+<div class="flex items-center space-x-2">
+<p class="font-bold">이름</p>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">올린 시간</p>
+</div>
+<p class="mt-1">또 다른 댓글입니다. 다양한 의견을 볼 수 있습니다.</p>
+<div class="flex items-center space-x-4 mt-2 text-sm">
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">
+<span class="material-icons text-base">thumb_up_off_alt</span>
+<span>좋아요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">좋아요</button>
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">
+<span class="material-icons text-base">thumb_down_off_alt</span>
+<span>싫어요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">싫어요</button>
+</div>
+</div>
+</div>
+<div class="flex space-x-4">
+<img alt="프로필 사진" class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPyJb4sdR02cGiJK8Q-DONfsNrKNZPmb7aDCU3yCy78RG9CE8njnoD2fGw_SSvWisBn3wzf_bLi0Tb0sHt4wPzYT77X47XSFCCbxN2c4jdSeNma7DFMqnYevNgXQhSiBUmviqdA1ca-mKmlErV1F5fwS_rCi1y1qqPESIFEKEHE_wmoPqxIwpNpABwZ331ck3Fgr7ENacvJEZBqAMZCkP_hgR8EcJnobA6IYkH0vTFDl-T2iklg_odl-iJJ5AVwsowWVIC968Q39I"/>
+<div class="flex-grow">
+<div class="flex items-center space-x-2">
+<p class="font-bold">이름</p>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">올린 시간</p>
+</div>
+<p class="mt-1">세 번째 댓글입니다. 이 댓글은 조금 더 길게 작성하여 레이아웃을 테스트해 보겠습니다. 이렇게 길어도 자연스럽게 보입니다.</p>
+<div class="flex items-center space-x-4 mt-2 text-sm">
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">
+<span class="material-icons text-base">thumb_up_off_alt</span>
+<span>좋아요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">좋아요</button>
+<button class="flex items-center space-x-1 text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">
+<span class="material-icons text-base">thumb_down_off_alt</span>
+<span>싫어요 수</span>
+</button>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-red-500">싫어요</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 text-center">
+<button class="bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">더보기</button>
+</div>
+</div>
+</main>
+<aside class="space-y-8">
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
+<h3 class="text-lg font-bold mb-4">이 기사의 성향</h3>
+<div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-4 mb-2">
+<div class="bg-gradient-to-r from-accent-jinbo to-accent-bosu h-4 rounded-full" style="width: 100%"></div>
+<div class="relative" style="left: 57%;">
+<div class="w-1 h-6 bg-text-light dark:bg-text-dark -mt-5"></div>
+</div>
+</div>
+<div class="flex justify-between text-sm font-semibold">
+<span class="text-accent-jinbo">진보 57</span>
+<span class="text-accent-bosu">43 보수</span>
+</div>
+<p class="text-center text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">중도 성향</p>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
+<h3 class="text-lg font-bold mb-4">이 기사를 보는 사람들 통계</h3>
+<p class="text-text-secondary-light dark:text-text-secondary-dark">(성별/나이)</p>
+<div class="mt-4 space-y-3">
+<div class="flex items-center">
+<span class="w-20 text-sm">남성 20대</span>
+<div class="w-full bg-gray-200 dark:bg-gray-500 rounded-full h-2.5">
+<div class="bg-blue-500 h-2.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-20 text-sm">여성 30대</span>
+<div class="w-full bg-gray-200 dark:bg-gray-500 rounded-full h-2.5">
+<div class="bg-pink-500 h-2.5 rounded-full" style="width: 30%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-20 text-sm">남성 40대</span>
+<div class="w-full bg-gray-200 dark:bg-gray-500 rounded-full h-2.5">
+<div class="bg-blue-500 h-2.5 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
+<h3 class="text-lg font-bold mb-4">다른 관점의 기사</h3>
+<div class="space-y-4">
+<div class="flex items-center space-x-4">
+<img alt="기사 사진" class="w-20 h-16 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxp2ZbUECvA8hwqEgt24-Q-iT60GOq6e9u4RSdWymbywPMqBftdzVFvNePNlCXFyDCJOcWudavMAMf0s21g3WYlDOQUASiaM1jNkCfC6jJs5qvADuElLGkGlsxXA8Gci3E8bsotBu0DaNOPwMFl_W9xx0uMbZb5DWV312YUCItPNffTqXJ2p4foD4m91B_S9JCi3sEbX1vq-gs4qT4A8ncWhCSmj9BTN714S6IUjejCQg8cPPwtrNeXDXJ4jnnl2pYRuJYryMt3dU"/>
+<div class="flex-grow">
+<a class="font-bold hover:underline" href="#">기사제목</a>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">언론사</p>
+</div>
+<div class="w-6 h-6 rounded-md bg-cyan-400"></div>
+</div>
+<div class="flex items-center space-x-4">
+<img alt="기사 사진" class="w-20 h-16 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdkq7Wk09RaoZ6-kjSp6rvIgH6sTwekweYKZAKUj7HnKEc6BoTOKjWaw1qKGxbjgc8DnHWFFERszhUh08yBPnJWB8sduKOQclBUinkJ43E5NsOAN3YGWEfy3TI7rUvmTC1aAvRDbpHUQljY14v7maBI0NThuGpHGc1bU78oQpbF6O8eOIbDFbs_2twokaw9TPhNJB-7wkwno9x3VDj6EksV50ZP2EBKbFRuG382nxFZuz77r8vo_WUpOkwFcSXEp0m2WzbhGH-emE"/>
+<div class="flex-grow">
+<a class="font-bold hover:underline" href="#">기사제목</a>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">언론사</p>
+</div>
+<div class="w-6 h-6 rounded-md bg-gray-300 dark:bg-gray-600"></div>
+</div>
+<div class="flex items-center space-x-4">
+<img alt="기사 사진" class="w-20 h-16 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmumJvZUISWwVxWfIm3xoCPEP01-58Bq17Ol3V3lM5mpGTSaqvp3dNH190oRSxIoNcXB4VrtrSnR4rd3XDbxLpZw9cjGpr3KJDE_4761zSaWIJJ4dR4zNFHLtGicjwkGYO_hdKzYbYFH5K9PVjVEeLGO9M5a0QgvgXiKu_f1yRqA5lpDb2CL5bC3cseTqwp0Qpssw3K2EBGLqiSqKz1IGqvtlJUnV2qthgrmhAd6NmsRhyik61og7vTnFc_RXKZX0fDXJqAxQCf7w"/>
+<div class="flex-grow">
+<a class="font-bold hover:underline" href="#">기사제목</a>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">언론사</p>
+</div>
+<div class="w-6 h-6 rounded-md bg-cyan-400"></div>
+</div>
+<div class="flex items-center space-x-4">
+<img alt="기사 사진" class="w-20 h-16 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNvshnD09xxqTsUTkj3KbmjrrSBnAXyE8xaVvfQo9YUOIhWLkt0JpfP-ykoFzpFqCRHaX1VHV1NPlQWYc1g-lMsiW8xupy3vigJ_gKCxnZ4BPZJ_hqgkvJ6HuPDT92_Xr7nnVSoeYsG22qJ7RRm6R74juuQmvQTo5GKJgAMjQbvBTuZ-s1Kwib3Rm3z4jcCiwCzSy2aQWsELce7rkOAYYm6sWXoj9uMPID16dUtETvb0Nh2q-JyOoBTCb3sCesBAee0I5pMqM4lcg"/>
+<div class="flex-grow">
+<a class="font-bold hover:underline" href="#">기사제목</a>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">언론사</p>
+</div>
+<div class="w-6 h-6 rounded-md bg-cyan-400"></div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+
+</body></html>

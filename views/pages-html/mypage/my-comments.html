@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Comments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366F1", // Indigo 500
+                        "background-light": "#F9FAFB", // Gray 50
+                        "background-dark": "#111827", // Gray 900
+                    },
+                    fontFamily: {
+                        display: ["Noto Sans KR", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem", // 8px
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto">
+<header class="flex items-center space-x-4 mb-8">
+                <div class="flex items-center space-x-4 flex-grow">
+                    <!--홈버튼-->
+                    <button class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
+                        <span class="material-icons">home</span>
+                    </button>
+                </div>
+                <!--my버튼-->
+                <button class="ml -4 bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">MY</button>
+            </header>
+<main>
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">내가 단 댓글</h1>
+    <!--검색창-->
+    <div class="mb-10">
+        <div class="relative max-w-2xl mx-auto">
+            <input class="w-full pl-5 pr-28 py-3 rounded-full border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark focus:ring-primary focus:border-primary transition-colors" placeholder="검색어 입력" type="text"/>
+            <button class="absolute right-1 top-1/2 -translate-y-1/2 bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-primary/90 transition-colors">
+                검색
+            </button>
+        </div>
+    </div>
+    <div class="space-y-6">
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+<div class="flex items-start space-x-4">
+<img alt="뉴스 이미지" class="w-24 h-24 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbQt-hJVKl53Pe_pEw8aH-5ek1rOk2G-OIQ31U5s2csDvLmDhLrGK6dMKTBvbjWKw2ACSv-NQmZ1w-1hqprXs_wLGYBAAF3NZbxf4n5DYezwS0PuLe6PD7B7ziwGUH0Pd4fzLYSBKzR-uXwfAj4oth_jAesC_ZOANKO_Eo3nQcohxQ2K6m6nkXNzDSq0oGrdoyoVrqR4yzPG7s2HVzxaVCQH5HPZNAPscwujpJVes8Kdpwub6LOikrZSzs9HK0st-3eZbnLcAg2DI"/>
+<div class="flex-1">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white mb-2">뉴스 타이틀 1</h2>
+<p class="text-gray-700 dark:text-gray-300 mb-4">정치에 대한 댓글 내용입니다. 이 댓글은 사용자가 작성한 것으로, 뉴스 기사에 대한 자신의 의견을 표현하고 있습니다.</p>
+<div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+<span class="text-xs">2시간 전</span>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors">
+<span class="material-icons text-base">thumb_up_alt</span>
+</button>
+<span>12</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-500 transition-colors">
+<span class="material-icons text-base">thumb_down_alt</span>
+</button>
+<span>3</span>
+</div>
+<button class="text-primary hover:underline">수정</button>
+<button class="text-red-500 hover:underline">삭제</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+<div class="flex items-start space-x-4">
+<img alt="뉴스 이미지" class="w-24 h-24 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAByG64AP9h0QkcorSneM32Ip8FT0mTCEjNnQqlpNwxn8_wBVC6WitG4OXq7SJ5mUXAWr1bvWfLkZnvyuTlyBcbQNXp5VKmueTcg9AK41kmwra6SinePS3cfDKLL65wf4tEgtfZWyTTeXjyOuY0BYeSm4sJ41eMAbN2ldhXl7_j6t8Ow5iRwqX4O3ZONrKzDuM95-irrpwPsvs1kwudAiCiIi8wwoYi_meuXgTDIwHSIpiexvF1qKHjt-ijMS1aTtw837tGehe3qjY"/>
+<div class="flex-1">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white mb-2">경제 관련 뉴스 타이틀</h2>
+<p class="text-gray-700 dark:text-gray-300 mb-4">최근 경제 동향에 대한 제 생각입니다. 이 부분은 조금 더 길게 작성하여 댓글 내용이 어떻게 표시되는지 확인할 수 있도록 합니다.</p>
+<div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+<span class="text-xs">1일 전</span>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors">
+<span class="material-icons text-base">thumb_up_alt</span>
+</button>
+<span>45</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-500 transition-colors">
+<span class="material-icons text-base">thumb_down_alt</span>
+</button>
+<span>8</span>
+</div>
+<button class="text-primary hover:underline">수정</button>
+<button class="text-red-500 hover:underline">삭제</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+<div class="flex items-start space-x-4">
+<img alt="뉴스 이미지" class="w-24 h-24 object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMtnBEjuIZRDdC3hWPVbvn2-cfy3HTKP0itA_ld6v-MPBGZ5AqQ4DwxBAh62ib4HSBVuos38T3P6Ua4P5qoZWayEKhLQsU3XyXbsKTN-ohmsn1lnryPI8cmBf5aPp8sMY8ZQqSkI1JQSSKhOf_6eryaBPHWItlkIVLjTVd92oJ743Rcef4ZUR2AW3AEgxjgIMd2gd9dTMqt4ftMoWI3P2suzVXlx37wTHZ9fioMYuVkmdwleUNFqUanUb-EeuPefLzqy3Tq6xwj6g"/>
+<div class="flex-1">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white mb-2">사회 이슈에 대한 뉴스</h2>
+<p class="text-gray-700 dark:text-gray-300 mb-4">이 댓글은 사회 문제에 대한 짧은 의견입니다.</p>
+<div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+<span class="text-xs">3일 전</span>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors">
+<span class="material-icons text-base">thumb_up_alt</span>
+</button>
+<span>102</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-500 transition-colors">
+<span class="material-icons text-base">thumb_down_alt</span>
+</button>
+<span>15</span>
+</div>
+<button class="text-primary hover:underline">수정</button>
+<button class="text-red-500 hover:underline">삭제</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

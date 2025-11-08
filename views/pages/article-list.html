@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>뉴스 추천 사이트</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366F1",
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#1F2937",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#374151",
+                        "text-light": "#111827",
+                        "text-dark": "#F9FAFB",
+                        "subtext-light": "#6B7280",
+                        "subtext-dark": "#9CA3AF"
+                    },
+                    fontFamily: {
+                        display: ["Noto Sans KR", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
+<div class="container mx-auto px-4 py-8">
+<header class="flex items-center justify-between mb-8">
+<div class="flex items-center space-x-4">
+<button class="bg-primary text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-colors duration-300">홈 버튼</button>
+<div class="relative flex-grow">
+<input class="w-full lg:w-96 pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="검색어 입력" type="text"/>
+<button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
+<span class="material-icons">search</span>
+</button>
+</div>
+</div>
+<button class="bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">MY</button>
+</header>
+<main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex space-x-6">
+<div class="w-32 h-32 flex-shrink-0">
+<img alt="뉴스 이미지 1" class="w-full h-full object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQF-O__3mTpsPkeLl40GPNY-IS9hVaALIob-s9N5csvYky0pwfiCvNAAFJr9zSHHBO8duy9MaIdXiaXhsmKkevwXIRDocW4LKGITdKE_Mbl2GKDJztVp_mVMWdHexbuNBGp-zKVQVFABOetAj2lHmbi_sYm9IB4c8nAcArifbz_Ol1oxCDuehgSb4pM2XiWoFET5wS9obX2m2ooomaqbBfOROHVhlddrVsrTQBIdjzmV5WttSaiusswc5DStXzog-ihuGoIdzVIg"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h2 class="text-xl font-bold text-text-light dark:text-text-dark">뉴스 타이틀 1</h2>
+<div class="flex space-x-2 text-sm">
+<span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">진보 57</span>
+<span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">보수 43</span>
+</div>
+</div>
+<p class="text-subtext-light dark:text-subtext-dark mb-4">뉴스 요약 텍스트가 여기에 들어갑니다. 기사의 주요 내용을 간략하게 설명합니다.</p>
+<p class="font-semibold mb-2">중도 성향</p>
+<div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">언론사</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">nn분전</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">댓글 개수</span>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex space-x-6">
+<div class="w-32 h-32 flex-shrink-0">
+<img alt="뉴스 이미지 2" class="w-full h-full object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtxf8daMZ7vqGIpHPRQhaFoyhamwitpHNnE7vToUhp0HPMfEFX9g0L1ux6ujCTtZJAhP1xpGXU4ceREyiV_F5mSWvKFtm6FRJcGc8aqRnxbX24brtIDCeYzOqjNLDCmkmBltwWWDIp0tO7OXJejztKV_k4jXYpuwyhAC8H-k48xFYF24Arb0Wo9swr7_86yGkYn8fTLb8twG4664l21fx3b1AoiTvIkuHvBIuMvMYt_1XWxi-jmBj_9TwUqvYTkykpNYqfTx5boA"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h2 class="text-xl font-bold text-text-light dark:text-text-dark">뉴스 타이틀 1</h2>
+<div class="flex space-x-2 text-sm">
+<span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">진보 20</span>
+<span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">보수 80</span>
+</div>
+</div>
+<p class="text-subtext-light dark:text-subtext-dark mb-4">뉴스 요약 텍스트가 여기에 들어갑니다. 기사의 주요 내용을 간략하게 설명합니다.</p>
+<p class="font-semibold mb-2">보수 성향</p>
+<div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">언론사</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">nn분전</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">댓글 개수</span>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex space-x-6">
+<div class="w-32 h-32 flex-shrink-0">
+<img alt="뉴스 이미지 3" class="w-full h-full object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9nK6tyTfu2hfhTk8LE5sbtWSGlBOlnrVTL8JF3FwzAYdnbMwaqSvUYGTcIO2spqzJnLNT_uSlzmwc0TRuRrtNel4TuNJbAzQ4ABcoUMthBT_LRnd51fFM80G_0_00FKEu-UvhvX8E5X9OOZac1gQ_r29UEykI6AsObDwUAlcnjRYKUbRj9BRM1G3iqGgf36gic6h6JEVi1Asn1M7SmU4-DnQtqWeugwvZGsaMGWiSiLMCKntRDZWMt7InxkiMSW4n81KTRQ701w"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h2 class="text-xl font-bold text-text-light dark:text-text-dark">뉴스 타이틀 1</h2>
+<div class="flex space-x-2 text-sm">
+<span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">진보 82</span>
+<span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">보수 18</span>
+</div>
+</div>
+<p class="text-subtext-light dark:text-subtext-dark mb-4">뉴스 요약 텍스트가 여기에 들어갑니다. 기사의 주요 내용을 간략하게 설명합니다.</p>
+<p class="font-semibold mb-2">진보 성향</p>
+<div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">언론사</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">nn분전</span>
+<span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">댓글 개수</span>
+</div>
+</div>
+</div>
+</div>
+<aside class="space-y-8">
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
+<h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">최근 일주일 내가 본 기사들의 성향</h3>
+<div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
+<div class="flex items-center justify-center bg-yellow-500" style="width: 20%">진보 20%</div>
+<div class="flex items-center justify-center bg-gray-500" style="width: 40%">중도 40%</div>
+<div class="flex items-center justify-center bg-cyan-500" style="width: 40%">보수 40%</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
+<h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">지금까지 내가 본 기사들의 성향</h3>
+<div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
+<div class="flex items-center justify-center bg-yellow-500" style="width: 20%">진보 20%</div>
+<div class="flex items-center justify-center bg-gray-500" style="width: 40%">중도 40%</div>
+<div class="flex items-center justify-center bg-cyan-500" style="width: 40%">보수 40%</div>
+</div>
+</div>
+</aside>
+</main>
+</div>
+
+</body></html>

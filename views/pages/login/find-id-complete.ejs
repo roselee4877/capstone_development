@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Find ID</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366F1",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1F2937",
+                        "text-light": "#1F2937",
+                        "text-dark": "#F9FAFB",
+                        "subtext-light": "#6B7280",
+                        "subtext-dark": "#9CA3AF"
+                    },
+                    fontFamily: {
+                        display: ["Noto Sans KR", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex flex-col min-h-screen">
+<header class="w-full">
+<div class="container mx-auto px-4 py-6 flex justify-between items-center">
+<a class="text-xl font-bold text-primary" href="#">NewsFeed</a>
+<div class="flex items-center space-x-2">
+<a class="px-4 py-2 text-sm font-medium text-primary dark:text-white border border-primary rounded-md hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors" href="#">로그인</a>
+<a class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-indigo-700 transition-colors" href="#">회원가입</a>
+</div>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center">
+<div class="w-full max-w-md mx-auto p-8 bg-card-light dark:bg-card-dark rounded-lg shadow-lg text-center">
+<div class="mb-8">
+<span class="material-icons text-5xl text-primary mb-4">
+                        mark_email_read
+                    </span>
+<h1 class="text-2xl font-bold text-text-light dark:text-text-dark mb-2">메일이 발송되었습니다.</h1>
+<p class="text-subtext-light dark:text-subtext-dark">ID를 확인한 후 로그인 해주시길 바랍니다</p>
+</div>
+<a class="w-full inline-block px-6 py-3 bg-primary text-white font-bold rounded-md hover:bg-indigo-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-background-dark" href="#">
+                    홈으로
+                </a>
+</div>
+</main>
+<footer class="w-full py-6">
+<div class="container mx-auto text-center text-subtext-light dark:text-subtext-dark text-sm">
+<p>© 2024 NewsFeed. All rights reserved.</p>
+</div>
+</footer>
+</div>
+
+</body></html>
