@@ -7,7 +7,7 @@ const routes = require('./routes/routes');
 const app = express();
 const port = 3000;
 
-// EJS 템플릿 엔진 설정 및 뷰 경로 설정 (기존 app.js 로직 유지)
+// EJS 템플릿 엔진 설정 및 뷰 경로 설정 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views')); // 뷰 폴더 경로
 app.use(express.static('public'));
