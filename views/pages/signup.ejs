@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#6366F1", // Indigo-500
+            "background-light": "#F9FAFB", // Gray-50
+            "background-dark": "#1F2937", // Gray-800
+          },
+          fontFamily: {
+            display: ["Noto Sans KR", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem", // 8px
+          },
+        },
+      },
+    };
+  </script>
+<style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-display">
+<div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <header class="w-full max-w-4xl mx-auto flex justify-between items-center py-4 px-6 fixed top-0 bg-background-light dark:bg-background-dark z-10">
+        <a href="/" class="flex items-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+            <span class="material-icons">arrow_back</span>
+            <span class="ml-2 font-semibold">home</span>
+        </a>
+        <div class="flex items-center space-x-4">
+            <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors font-medium" href="/login">login</a>
+        </div>
+    </header>
+
+    <main class="w-full max-w-md mx-auto mt-24 bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">sign up</h1>
+        <form action="/signup" method="POST" class="space-y-6">
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="username">user name</label>
+            <input name="username" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition" id="username" placeholder="enter user name" type="text"/>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="password">password</label>
+            <input name="password" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition" id="password" placeholder="enter password" type="password"/>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">political orientation</label>
+          <select name="political" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition">
+            <option value="">select</option>
+            <option value="progressive">Progressive</option>
+            <option value="moderate">Moderate</option>
+            <option value="conservative">Conservative</option>
+            <option value="unknown">Not sure</option>
+          </select>
+        </div>
+
+        
+        <div class="pt-4">
+        <button class="w-full bg-primary text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-indigo-700 transition-all transform hover:scale-105" type="submit">complete</button>
+        </div>
+        </form>
+    </main>
+</div>
+
+</body></html>
+

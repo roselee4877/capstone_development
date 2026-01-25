@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>뉴스 추천 사이트</title>
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-
-    <script>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>뉴스 추천 사이트</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -35,162 +32,91 @@
             },
         };
     </script>
-
-    <style>
+<style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
         }
     </style>
 </head>
-
-<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
-
-<div class="container mx-auto px-4 py-8">
-
-    <!-- HEADER -->
-    <header class="flex items-center justify-between mb-8">
-
-        <div class="flex items-center space-x-4">
-            <button class="bg-primary text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-colors duration-300">
-                홈 버튼
-            </button>
-
-            <div class="relative flex-grow">
-                <input
-                    type="text"
-                    placeholder="검색어 입력"
-                    class="w-full lg:w-96 pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-
-                <button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
-                    <span class="material-icons">search</span>
-                </button>
-            </div>
-        </div>
-
-        <button class="bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
-            MY
-        </button>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- LEFT: 뉴스 목록 -->
-        <div class="lg:col-span-2 space-y-6">
-
-            <% newsList.forEach(news => { %>
-
-            <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex space-x-6">
-
-                <!-- 뉴스 이미지 -->
-                <div class="w-32 h-32 flex-shrink-0">
-                    <img
-                        src="<%= news.imageUrl %>"
-                        alt="뉴스 이미지"
-                        class="w-full h-full object-cover rounded-lg"
-                    />
+    <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
+        <div class="container mx-auto px-4 py-8">
+            <header class="flex items-center space-x-4 mb-8">
+                <div class="flex items-center space-x-4 flex-grow">
+                    <!--홈버튼-->
+                    <button class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
+                        <span class="material-icons">home</span>
+                    </button>
+                    <!--검색어창-->
+                    <div class="relative flex-grow">
+                        <input class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="검색어 입력" type="text"/>
+                        <button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
+                            <span class="material-icons">search</span>
+                        </button>
+                    </div>
                 </div>
-
-                <!-- 뉴스 내용 -->
-                <div class="flex-grow">
-                    <div class="flex justify-between items-start mb-2">
-
-                        <!-- 뉴스 제목 -->
-                        <h2 class="text-xl font-bold text-text-light dark:text-text-dark">
-                            <%= news.title %>
-                        </h2>
-
-                        <!-- 진보 / 보수 점수 -->
-                        <div class="flex space-x-2 text-sm">
-                            <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">
-                                진보 <%= news.progressive %>
-                            </span>
-
-                            <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">
-                                보수 <%= news.conservative %>
-                            </span>
+                <!--my버튼-->
+                <a href="/logout" class="ml-4 bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+                    log out
+                </a>
+            </header>
+<main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-6">
+        <% if (articles && articles.length > 0) { %>
+            <% articles.forEach(article => { %>
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex space-x-6">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h2 class="text-xl font-bold text-text-light dark:text-text-dark">
+                                <a href="/article/<%= article.article_id %>">
+                                    <%= article.title %>
+                                </a>
+                            </h2>
+                            <div class="flex space-x-2 text-sm">
+                                <% if (article.conservative_percent > 60) { %>
+                                    <span class="bg-teal-200 text-teal-800 dark:bg-teal-900 dark:text-teal-300 px-2 py-1 rounded-full font-medium">Con</span>
+                                <% } else if (article.progress_percent > 60) { %>
+                                    <span class="bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full font-medium">Pro</span>
+                                <% } else { %>
+                                    <span class="bg-gray-200 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">Mod</span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <p class="text-subtext-light dark:text-subtext-dark mb-4">
+                            <%= article.summary %>
+                        </p>
+                        <div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
+                            <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full"><%= article.publisher_id %></span>
+                            <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full"><%= article.created_at.toLocaleDateString() %></span>
                         </div>
                     </div>
-
-                    <!-- 뉴스 요약 -->
-                    <p class="text-subtext-light dark:text-subtext-dark mb-4">
-                        <%= news.summary %>
-                    </p>
-
-                    <!-- 성향 표시 텍스트 -->
-                    <p class="font-semibold mb-2">
-                        <%= news.biasText %>
-                    </p>
-
-                    <!-- 부가 정보 -->
-                    <div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
-                        <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">
-                            <%= news.press %>
-                        </span>
-
-                        <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">
-                            <%= news.timeAgo %>
-                        </span>
-
-                        <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">
-                            댓글 <%= news.commentCount %>
-                        </span>
-                    </div>
                 </div>
+            <% }); %>
+        <% } else { %>
+            <p class="text-center py-10">no news</p>
+        <% } %>
+    </div>
 
+
+
+    <aside class="space-y-8">
+        <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
+            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">최근 일주일 내가 본 기사들의 성향</h3>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
+                <div class="flex items-center justify-center bg-yellow-400" style="width: 20%">진보 20%</div>
+                <div class="flex items-center justify-center bg-gray-300" style="width: 40%">중도 40%</div>
+                <div class="flex items-center justify-center bg-teal-400" style="width: 40%">보수 40%</div>
             </div>
-
-            <% }) %>
-
         </div>
-
-
-        <!-- RIGHT: 성향 통계 -->
-        <aside class="space-y-8">
-
-            <!-- 최근 일주일 -->
-            <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
-                <h3 class="text-lg font-bold mb-4">최근 일주일 내가 본 기사들의 성향</h3>
-
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
-                    <div class="flex items-center justify-center bg-yellow-500" style="width: 20%">
-                        진보 20%
-                        <% /* <%= weeklyProgressive %>% */ %>
-                    </div>
-
-                    <div class="flex items-center justify-center bg-gray-500" style="width: 40%">
-                        중도 40%
-                    </div>
-
-                    <div class="flex items-center justify-center bg-cyan-500" style="width: 40%">
-                        보수 40%
-                    </div>
-                </div>
+        <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
+            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">지금까지 내가 본 기사들의 성향</h3>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
+            <div class="flex items-center justify-center bg-yellow-400" style="width: 40%">진보 40%</div>
+            <div class="flex items-center justify-center bg-gray-300" style="width: 30%">중도 30%</div>
+            <div class="flex items-center justify-center bg-teal-400" style="width: 30%">보수 30%</div>
             </div>
-
-            <!-- 전체 -->
-            <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
-                <h3 class="text-lg font-bold mb-4">지금까지 내가 본 기사들의 성향</h3>
-
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
-                    <div class="flex items-center justify-center bg-yellow-500" style="width: 20%">
-                        진보 20%
-                    </div>
-
-                    <div class="flex items-center justify-center bg-gray-500" style="width: 40%">
-                        중도 40%
-                    </div>
-
-                    <div class="flex items-center justify-center bg-cyan-500" style="width: 40%">
-                        보수 40%
-                    </div>
-                </div>
-            </div>
-
-        </aside>
-
-    </main>
+        </div>
+    </aside>
+</main>
 </div>
 
 </body>
