@@ -85,7 +85,7 @@
                             <%= article.summary %>
                         </p>
                         <div class="flex space-x-2 text-sm text-subtext-light dark:text-subtext-dark">
-                            <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full"><%= article.publisher_id %></span>
+                            <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full"><%= article.publisher %></span>
                             <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full"><%= article.created_at.toLocaleDateString() %></span>
                         </div>
                     </div>
@@ -100,19 +100,19 @@
 
     <aside class="space-y-8">
         <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
-            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">최근 일주일 내가 본 기사들의 성향</h3>
+            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">My Weekly Political Lean</h3>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
-                <div class="flex items-center justify-center bg-yellow-400" style="width: 20%">진보 20%</div>
-                <div class="flex items-center justify-center bg-gray-300" style="width: 40%">중도 40%</div>
-                <div class="flex items-center justify-center bg-teal-400" style="width: 40%">보수 40%</div>
+                <div class="flex items-center justify-center bg-yellow-400" style="width: 20%">pro 20%</div>
+                <div class="flex items-center justify-center bg-gray-300" style="width: 40%">mod 40%</div>
+                <div class="flex items-center justify-center bg-teal-400" style="width: 40%">con 40%</div>
             </div>
         </div>
         <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg">
-            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">지금까지 내가 본 기사들의 성향</h3>
+            <h3 class="text-lg font-bold mb-4 text-text-light dark:text-text-dark">My Overall Political Lean</h3>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden flex text-white text-xs font-medium">
-            <div class="flex items-center justify-center bg-yellow-400" style="width: 40%">진보 40%</div>
-            <div class="flex items-center justify-center bg-gray-300" style="width: 30%">중도 30%</div>
-            <div class="flex items-center justify-center bg-teal-400" style="width: 30%">보수 30%</div>
+            <div class="flex items-center justify-center bg-yellow-400" style="width: 40%">pro 40%</div>
+            <div class="flex items-center justify-center bg-gray-300" style="width: 30%">mod 30%</div>
+            <div class="flex items-center justify-center bg-teal-400" style="width: 30%">con 30%</div>
             </div>
         </div>
     </aside>

@@ -13,7 +13,6 @@ const initDB = async () => {
 
         // Create tables
         console.log('Creating new tables...');
-        // TODO: 설계한 스키마에 맞춰 새로운 테이블을 생성하는 코드를 작성하세요.
 
         await db.pool.query(`
             CREATE TABLE User (

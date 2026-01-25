@@ -55,13 +55,13 @@
                 <article class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <div class="prose dark:prose-invert max-w-none">
                         <span class="inline-block bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark text-sm font-medium px-3 py-1 rounded-full mb-4">
-                            Publisher ID: <%= article.publisher_id %>
+                            <%= article.publisher %>
                         </span>
                         <h1 class="text-3xl font-bold mb-4"><%= article.title %></h1>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
-                            <span>Reporter ID: <%= article.reporter_id %></span>
+                            <span><%= article.reporter %></span>
                             <span class="hidden sm:inline">|</span>
-                            <span>Published: <%= article.created_at.toLocaleDateString() %></span>
+                            <span><%= article.created_at.toLocaleDateString() %></span>
                         </div>
 
                         <img alt="News Image" class="w-full h-auto rounded-lg mb-6 shadow-sm" src="https://ichef.bbci.co.uk/news/1024/cpsprodpb/6f27/live/b0083d80-c770-11f0-a882-55e7f9e7585f.jpg.webp"/>
@@ -105,8 +105,81 @@
                 <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <h3 class="text-lg font-bold mb-4">Different Perspectives</h3>
                     <div class="space-y-4">
-                        <p class="text-sm text-text-secondary-light">Recommended articles based on cluster <%= article.cluster_id %></p>
+                        <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors">Trump ally Marjorie Taylor Greene to quit Congress after Epstein files feud</h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Washington</p>
                         </div>
+                        <div class="w-6 h-6 rounded-full bg-teal-300 flex-shrink-0"></div>
+                        </a>
+                        <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors">Marjorie Taylor Greene doubles down on Epstein files amid fallout with Trump</h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">BBC</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-teal-300 flex-shrink-0"></div>
+                        </a>
+                        <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors">When will the Epstein files be released and will they be redacted?</h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">The White House</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-500 flex-shrink-0"></div>
+                        </a>
+                        <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors">Trump signs bill ordering US justice department to release Epstein files</h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Fox</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-500 flex-shrink-0"></div>
+                        </a>
+                    </div>
+                </div>
+                
+                
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold mb-4">More news</h3>
+                    <div class="space-y-4">
+                    <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                Why Economic Equality Starts with a Living Wage
+                            </h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">The Guardian</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-yellow-400 flex-shrink-0 shadow-sm" title="Progressive leaning"></div>
+                    </a>
+
+                    <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                Closing the Gun Show Loophole: A Moral Imperative
+                            </h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">New York Times</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-yellow-400 flex-shrink-0 shadow-sm" title="Progressive leaning"></div>
+                    </a>
+
+                    <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                Understanding the Infrastructure of Renewable Energy
+                            </h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">BBC News</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-500 flex-shrink-0 shadow-sm" title="Moderate"></div>
+                    </a>
+
+                    <a class="flex items-center gap-4 group" href="#">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                The Future of Bipartisan Cooperation in the Senate
+                            </h4>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Reuters</p>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-500 flex-shrink-0 shadow-sm" title="Moderate"></div>
+                    </a>
+                </div>
                 </div>
             </aside>
         </div>
