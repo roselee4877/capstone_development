@@ -9,6 +9,8 @@ const initDB = async () => {
         await db.pool.query('DROP TABLE IF EXISTS User;');
         await db.pool.query('DROP TABLE IF EXISTS Article;');
         await db.pool.query('DROP TABLE IF EXISTS Log;');
+        await db.pool.query('DROP TABLE IF EXISTS Keyword;');
+        await db.pool.query('DROP TABLE IF EXISTS recommendation;');
         await db.pool.query('SET FOREIGN_KEY_CHECKS = 1;');
 
         // Create tables
@@ -28,13 +30,14 @@ const initDB = async () => {
         await db.pool.query(`
             CREATE TABLE Article (
                 article_id BIGINT NOT NULL,
-                cluster_id BIGINT NOT NULL,
+                cluster_id BIGINT,
                 title VARCHAR(200) NOT NULL,
                 summary TEXT,
                 reporter VARCHAR(50),
                 publisher VARCHAR(50),
                 created_at DATE,
                 article_content LONGTEXT,
+                label VARCHAR(10),
                 progress_percent DECIMAL(5,2),
                 conservative_percent DECIMAL(5,2),
 
@@ -59,9 +62,22 @@ const initDB = async () => {
             CREATE TABLE Keyword (
                 article_id BIGINT NOT NULL,
                 keyword VARCHAR(200) NOT NULL,
+                sentence TEXT,
 
-                PRIMARY KEY (log_id, keyword),
+                PRIMARY KEY (article_id, keyword),
                 FOREIGN KEY (article_id) REFERENCES Article(article_id)
+            );
+        `);
+
+        await db.pool.query(`
+            CREATE TABLE Recommendation (
+                article_id BIGINT NOT NULL,
+                label VARCHAR(30),
+                recommend_id BIGINT NOT NULL,
+
+                PRIMARY KEY (article_id, recommend_id),
+                FOREIGN KEY (article_id) REFERENCES Article(article_id),
+                FOREIGN KEY (recommend_id) REFERENCES Article(article_id)
             );
         `);
 

@@ -54,133 +54,209 @@
             <main class="lg:col-span-2 space-y-6">
                 <article class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <div class="prose dark:prose-invert max-w-none">
-                        <span class="inline-block bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark text-sm font-medium px-3 py-1 rounded-full mb-4">
-                            <%= article.publisher %>
-                        </span>
-                        <h1 class="text-3xl font-bold mb-4"><%= article.title %></h1>
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
-                            <span><%= article.reporter %></span>
-                            <span class="hidden sm:inline">|</span>
-                            <span><%= article.created_at.toLocaleDateString() %></span>
-                        </div>
+                        <% if (article.publisher) { %>
+                            <span class="inline-block bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark text-sm font-medium px-3 py-1 rounded-full mb-4">
+                                <%= article.publisher %>
+                            </span>
+                        <% } %>
 
-                        <img alt="News Image" class="w-full h-auto rounded-lg mb-6 shadow-sm" src="https://ichef.bbci.co.uk/news/1024/cpsprodpb/6f27/live/b0083d80-c770-11f0-a882-55e7f9e7585f.jpg.webp"/>
+                        <h1 class="text-3xl font-bold mb-4"><%= article.title %></h1>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
+                            <% if (article.reporter) { %>
+                                <span><%= article.reporter %></span>
+                            <% } %>
+                            
+                            <% if (article.reporter && article.created_at) { %>
+                                <span class="hidden sm:inline">|</span>
+                            <% } %>
+
+                            <% if (article.created_at) { %>
+                                <span><%= (article.created_at instanceof Date) ? article.created_at.toLocaleDateString() : article.created_at %></span>
+                            <% } %>
+                        </div>
                         
                         <div class="text-lg leading-relaxed space-y-4">
-                            <%- article.article_content %>
+                            <% 
+                                // 1. 서버에서 전달받은 keywords 배열 사용 (없을 경우를 대비해 빈 배열 기본값)
+                                const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
+
+                                // 2. 본문 내용 가져오기 (null 방지)
+                                let highlightedContent = article.article_content || '';
+
+                                // 3. article.label에 따른 색상 클래스 결정
+                                let colorClass = "";
+                                const label = article.label; // Left, Center, Right 중 하나
+
+                                if (label === 'Left') {
+                                    // 진보(Left): Yellow 계열
+                                    colorClass = "bg-yellow-200 dark:bg-yellow-900/50 border-yellow-400";
+                                } else if (label === 'Right') {
+                                    // 보수(Right): Teal 계열
+                                    colorClass = "bg-teal-200 dark:bg-teal-900/50 border-teal-400";
+                                } else {
+                                    // 중도(Center) 또는 기타: Gray 계열
+                                    colorClass = "bg-gray-200 dark:bg-gray-700/50 border-gray-400";
+                                }
+
+                                // 4. 하이라이트 로직 실행
+                                if (highlightedContent && currentKeywords.length > 0) {
+                                    // 키워드가 긴 것부터 정렬 (짧은 단어가 긴 단어의 일부를 먼저 하이라이트하는 것 방지)
+                                    const sortedKeywords = [...currentKeywords].sort((a, b) => b.length - a.length);
+
+                                    sortedKeywords.forEach(word => {
+                                        if (word && word.trim() !== '') {
+                                            // 정규식 특수문자 이스케이프 처리
+                                            const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                            const regex = new RegExp(`(${escapedWord})`, 'gi');
+                                            
+                                            // 위에서 결정된 colorClass를 사용하여 replace 실행
+                                            highlightedContent = highlightedContent.replace(
+                                                regex, 
+                                                `<span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight" 
+                                                    onclick="explainKeyword('${escapedWord}', '${label}')">$1</span>`
+                                            );
+                                        }
+                                    });
+                                }
+                            %>
+
+                            <div class="text-lg leading-relaxed space-y-4 article-body">
+                                <%- highlightedContent %>
+                            </div>
                         </div>
                     </div>
                 </article>
 
-                <section class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-bold mb-4">Comments <span class="text-primary">23</span></h2>
-                    <div class="flex gap-4 mb-6">
-                        <input class="flex-grow p-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" placeholder="Add a comment..." type="text"/>
-                        <button class="bg-primary text-white font-semibold py-3 px-6 rounded-lg shadow-md">Post</button>
-                    </div>
-                    </section>
+                
             </main>
+
+            <div id="keywordModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+                <div class="bg-card-light dark:bg-card-dark max-w-lg w-full rounded-xl shadow-2xl p-6 relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                        <span class="material-icons">close</span>
+                    </button>
+                    <h3 id="modalTitle" class="text-xl font-bold mb-4 text-primary"></h3>
+                    <div id="modalContent" class="text-text-light dark:text-text-dark leading-relaxed">
+                        </div>
+                </div>
+            </div>
+
+            <script>
+            async function explainKeyword(keyword, label) {
+                const modal = document.getElementById('keywordModal');
+                const title = document.getElementById('modalTitle');
+                const content = document.getElementById('modalContent');
+
+                // 모달 열기 및 로딩 표시
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                title.innerText = `Keyword: ${keyword}`;
+                content.innerHTML = '<div class="flex justify-center"><span class="animate-spin material-icons">sync</span> 분석 중...</div>';
+
+                try {
+                    const response = await fetch('/api/explain-keyword', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ keyword, label, title: "<%= article.title %>" })
+                    });
+                    const data = await response.json();
+                    content.innerText = data.explanation;
+                } catch (error) {
+                    content.innerText = "설명을 가져오는 중 오류가 발생했습니다.";
+                }
+            }
+
+            function closeModal() {
+                document.getElementById('keywordModal').classList.add('hidden');
+                document.getElementById('keywordModal').classList.remove('flex');
+            }
+            </script>
 
             <aside class="space-y-8">
                 <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <h3 class="text-lg font-semibold mb-4">Political Bias</h3>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-8 overflow-hidden flex text-white text-xs font-bold mb-4">
-                        <div class="flex items-center justify-center bg-yellow-400" style="width: <%= article.progress_percent %>%">
-                            Pro <%= Math.round(article.progress_percent) %>%
-                        </div>
-                        <div class="flex items-center justify-center bg-teal-400" style="width: <%= article.conservative_percent %>%">
-                            Con <%= Math.round(article.conservative_percent) %>%
-                        </div>
+                    <div class="flex space-x-2 text-sm">
+                        <% if (article.label === 'Right') { %>
+                            <span class="bg-teal-200 text-teal-800 dark:bg-teal-900 dark:text-teal-300 px-2 py-1 rounded-full font-medium">Con</span>
+                        <% } else if (article.label === 'Left') { %>
+                            <span class="bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full font-medium">Pro</span>
+                        <% } else { %>
+                            <span class="bg-gray-200 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">Mod</span>
+                        <% } %>
                     </div>
 
-                    <% if (article.progress_percent > 60) { %>
-                        <div class="bg-yellow-400 p-4 rounded-lg text-white text-center font-bold">Progressive leaning</div>
-                    <% } else if (article.conservative_percent > 60) { %>
-                        <div class="bg-teal-500 p-4 rounded-lg text-white text-center font-bold">Conservative leaning</div>
-                    <% } else { %>
-                        <div class="bg-gray-400 p-4 rounded-lg text-white text-center font-bold">Moderate / Neutral</div>
-                    <% } %>
+        
                 </div>
 
-                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold mb-4">Different Perspectives</h3>
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-yellow-500">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-yellow-500">Progressive View</h3>
+                    </div>
+
                     <div class="space-y-4">
-                        <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors">Trump ally Marjorie Taylor Greene to quit Congress after Epstein files feud</h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Washington</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-teal-300 flex-shrink-0"></div>
-                        </a>
-                        <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors">Marjorie Taylor Greene doubles down on Epstein files amid fallout with Trump</h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">BBC</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-teal-300 flex-shrink-0"></div>
-                        </a>
-                        <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors">When will the Epstein files be released and will they be redacted?</h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">The White House</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-500 flex-shrink-0"></div>
-                        </a>
-                        <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors">Trump signs bill ordering US justice department to release Epstein files</h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Fox</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-500 flex-shrink-0"></div>
-                        </a>
+                        <% if (recommendations.Left && recommendations.Left.length > 0) { %>
+                            <% recommendations.Left.forEach(rec => { %>
+                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
+                                    <div class="flex-grow">
+                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                            <%= rec.title %>
+                                        </h4>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-sm text-gray-400">empty</p>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-gray-500">Center View</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <% if (recommendations.Center && recommendations.Center.length > 0) { %>
+                            <% recommendations.Center.forEach(rec => { %>
+                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
+                                    <div class="flex-grow">
+                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                            <%= rec.title %>
+                                        </h4>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-sm text-gray-400">empty</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-teal-500">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-teal-500">Conservative View</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <% if (recommendations.Right && recommendations.Right.length > 0) { %>
+                            <% recommendations.Right.forEach(rec => { %>
+                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
+                                    <div class="flex-grow">
+                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                                            <%= rec.title %>
+                                        </h4>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-sm text-gray-400">empty</p>
+                        <% } %>
                     </div>
                 </div>
                 
                 
-                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold mb-4">More news</h3>
-                    <div class="space-y-4">
-                    <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                Why Economic Equality Starts with a Living Wage
-                            </h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">The Guardian</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-yellow-400 flex-shrink-0 shadow-sm" title="Progressive leaning"></div>
-                    </a>
 
-                    <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                Closing the Gun Show Loophole: A Moral Imperative
-                            </h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">New York Times</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-yellow-400 flex-shrink-0 shadow-sm" title="Progressive leaning"></div>
-                    </a>
-
-                    <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                Understanding the Infrastructure of Renewable Energy
-                            </h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">BBC News</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-500 flex-shrink-0 shadow-sm" title="Moderate"></div>
-                    </a>
-
-                    <a class="flex items-center gap-4 group" href="#">
-                        <div class="flex-grow">
-                            <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                The Future of Bipartisan Cooperation in the Senate
-                            </h4>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Reuters</p>
-                        </div>
-                        <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-500 flex-shrink-0 shadow-sm" title="Moderate"></div>
-                    </a>
-                </div>
-                </div>
             </aside>
         </div>
     </div>
