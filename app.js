@@ -9,7 +9,7 @@ const db = require('./config/db');
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 // 발급받은 API 키를 넣으세요 (환경변수 사용 추천)
-const genAI = new GoogleGenerativeAI("AIzaSyDrU9c5dQSxkD1Vpr2P7cH3jygTTR7D2dM");
+const genAI = new GoogleGenerativeAI("AIzaSyCVW5VgGionVRy4EqKmCZ1C0NnZhjKglQo");
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -33,11 +33,28 @@ app.use((req, res, next) => {
 
 app.get('/', async (req, res) => {
     try {
-        // 1. 뉴스 목록 가져오기
-        const [articles] = await db.pool.query('SELECT * FROM Article ORDER BY created_at DESC');
+        const page = parseInt(req.query.page) || 1; // 현재 페이지 (기본값 1)
+        const limit = 10; // 한 페이지에 보여줄 개수
+        const offset = (page - 1) * limit;
 
+        // 1. 해당 페이지의 기사만 가져오기
+        const [articles] = await db.query(
+            "SELECT * FROM Article ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            [limit, offset]
+        );
+
+        // 2. 전체 페이지 수를 계산하기 위한 총 기사 수 구하기
+        const [[{ total }]] = await db.query("SELECT COUNT(*) as total FROM Article");
+        const totalPages = Math.ceil(total / limit);
+        const maxDisplayPages = 10;
+        let startPage = Math.max(1, page - Math.floor(maxDisplayPages / 2));
+        let endPage = startPage + maxDisplayPages - 1; 
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - maxDisplayPages + 1);
+        }
+        
         // 2. 사용자 성향 통계 가져오기 (예시: 세션의 user_id 사용)
-        // 실제 운영 시에는 복잡한 JOIN 쿼리가 필요하겠지만, 여기서는 예시 데이터를 보냅니다.
         const stats = {
             weekly: { progressive: 20, moderate: 40, conservative: 40 },
             total: { progressive: 40, moderate: 30, conservative: 30 }
@@ -47,7 +64,11 @@ app.get('/', async (req, res) => {
         res.render('pages/article-list', { 
             title: 'Article List',
             articles: articles,
-            stats: stats
+            stats: stats,
+            currentPage: page,
+            totalPages: totalPages,
+            startPage: startPage,
+            endPage: endPage
         });
     } catch (err) {
         console.error(err);
@@ -104,7 +125,7 @@ app.get('/article/:id', async (req, res) => {
 
 
 app.post('/api/explain-keyword', async (req, res) => {
-    const { keyword, label, title } = req.body;
+    const { keyword, label, title, content } = req.body;
 
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
@@ -112,12 +133,16 @@ app.post('/api/explain-keyword', async (req, res) => {
 
         
         const prompt = `
-            당신은 뉴스 미디어 분석 전문가입니다.
-            뉴스 제목: "${title}"
-            이 기사의 정치적 성향: "${label}"
-            
-            이 맥락에서 "${keyword}"라는 단어가 왜 해당 정치적 성향을 드러내는 '편향적 키워드'로 지목되었는지 분석해주세요.
-            사용자가 이해하기 쉽게 2~3문장으로 친절하게 설명해주세요. 한국어로 답변하세요.
+            You are an expert in news media analysis.
+
+            Article Title: "${title}"
+            Article Content: "${content}"
+            Political Bias Label of this Article: "${label}"
+
+            Please analyze why the keyword "${keyword}" was identified as a "biased keyword" that reveals this specific political orientation within this context. 
+
+            Provide a kind and concise explanation in only 1 sentences so that it is easy for the user to understand. 
+            Please respond in English.
         `;
 
         const result = await model.generateContent(prompt);
@@ -137,8 +162,77 @@ app.post('/api/explain-keyword', async (req, res) => {
         res.json(mockData);
         */
     } catch (err) {
-        console.error("Gemini API 에러:", err);
-        res.status(500).json({ explanation: "분석을 가져오는 데 실패했습니다." });
+        console.error("Gemini API Error:", err);
+        res.status(500).json({ explanation: "Explanation could not be retrieved." });
+    }
+});
+
+app.get('/search', async (req, res) => {
+    const query = req.query.q || "";
+    const page = parseInt(req.query.page) || 1; // 현재 페이지 번호 (기본값 1)
+    const limit = 10; // 한 페이지에 보여줄 기사 수
+    const offset = (page - 1) * limit;
+
+    if (!query) {
+        // 검색어가 없을 경우 빈 결과 페이지를 렌더링하거나 메인으로 리다이렉트
+        return res.render('pages/article-list.ejs', { 
+            articles: [], 
+            searchQuery: "", 
+            currentPage: 1, 
+            totalPages: 0, 
+            startPage: 1, 
+            endPage: 1 
+        });
+    }
+
+    // 1. 검색어를 공백 기준으로 분리
+    const keywords = query.split(/\s+/).filter(word => word.length > 0);
+
+    // 2. 검색 조건 및 파라미터 생성
+    const conditions = keywords.map(() => "(title LIKE ? OR article_content LIKE ?)").join(" AND ");
+    const params = [];
+    keywords.forEach(word => {
+        const likeWord = `%${word}%`;
+        params.push(likeWord, likeWord);
+    });
+
+    try {
+        // 3. 검색 결과 총 개수(Total) 가져오기 (페이지네이션 계산용)
+        const [countRows] = await db.query(
+            `SELECT COUNT(*) as count FROM Article WHERE ${conditions}`, 
+            params
+        );
+        const total = countRows[0].count;
+        const totalPages = Math.ceil(total / limit);
+
+        // 4. 해당 페이지의 데이터만 가져오기 (LIMIT, OFFSET 적용)
+        // 주의: params 배열 뒤에 limit와 offset을 추가로 붙여야 합니다.
+        const sql = `SELECT * FROM Article WHERE ${conditions} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+        const [rows] = await db.query(sql, [...params, limit, offset]);
+
+        // 5. 표시할 페이지 번호 범위 계산 (최대 10개씩)
+        const maxDisplayPages = 10;
+        let startPage = Math.max(1, page - Math.floor(maxDisplayPages / 2));
+        let endPage = startPage + maxDisplayPages - 1;
+
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - maxDisplayPages + 1);
+        }
+
+        // 6. EJS 렌더링 (모든 변수를 한꺼번에 전달)
+        res.render('pages/article-list.ejs', { 
+            articles: rows, 
+            searchQuery: query,
+            currentPage: page,
+            totalPages: totalPages,
+            startPage: startPage,
+            endPage: endPage
+        });
+
+    } catch (error) {
+        console.error("Search Error:", error);
+        res.status(500).send("검색 중 오류가 발생했습니다.");
     }
 });
 

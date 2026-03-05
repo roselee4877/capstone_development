@@ -31,25 +31,33 @@
                 },
             },
         };
-    </script>
+</script>
 <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
         }
-    </style>
+</style>
 </head>
     <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
-        <div class="container mx-auto px-4 py-8">
+        <div class="container mx-auto px-6 lg:px-20 py-8 max-w-7xl">
             <header class="flex items-center space-x-4 mb-8">
                 <div class="flex items-center space-x-4 flex-grow">
                     <!--홈버튼-->
-                    <button class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
-                        <span class="material-icons">home</span>
-                    </button>
+                    <a href="/">
+                        <button class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
+                            <span class="material-icons">home</span>
+                        </button>
+                    </a>
                     <!--검색어창-->
                     <div class="relative flex-grow">
-                        <input class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="검색어 입력" type="text"/>
-                        <button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
+                        <input id="searchInput" 
+                            class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" 
+                            placeholder="Search by keyword" 
+                            type="text"
+                            onkeyup="if(window.event.keyCode==13){executeSearch()}"/>
+                            
+                        <button onclick="executeSearch()" 
+                                class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
                             <span class="material-icons">search</span>
                         </button>
                     </div>
@@ -126,7 +134,71 @@
         </div>
     </aside>
 </main>
+
+<div class="w-full flex justify-center items-center space-x-4 mt-12 mb-10">
+    
+    <% if (currentPage > 1) { %>
+        <a href="?q=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&page=1" 
+           class="text-subtext-light dark:text-subtext-dark hover:text-primary transition-colors duration-200"
+           title="First Page">
+            <span class="material-icons text-2xl">first_page</span>
+        </a>
+    <% } %>
+
+    <% if (currentPage > 1) { %>
+        <a href="?q=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&page=<%= currentPage - 1 %>" 
+           class="text-subtext-light dark:text-subtext-dark hover:text-primary transition-colors duration-200"
+           title="Previous Page">
+            <span class="material-icons text-2xl">chevron_left</span>
+        </a>
+    <% } %>
+
+    <div class="flex items-center space-x-4 mx-2">
+        <% for(let i = startPage; i <= endPage; i++) { %>
+            <a href="?q=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&page=<%= i %>" 
+               class="text-lg transition-all duration-200 
+               <%= currentPage === i 
+                   ? 'text-primary font-bold border-b-2 border-primary pb-1' 
+                   : 'text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark font-medium' %>">
+                <%= i %>
+            </a>
+        <% } %>
+    </div>
+
+    <% if (currentPage < totalPages) { %>
+        <a href="?q=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&page=<%= currentPage + 1 %>" 
+           class="text-subtext-light dark:text-subtext-dark hover:text-primary transition-colors duration-200"
+           title="Next Page">
+            <span class="material-icons text-2xl">chevron_right</span>
+        </a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+        <a href="?q=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&page=<%= totalPages %>" 
+           class="text-subtext-light dark:text-subtext-dark hover:text-primary transition-colors duration-200"
+           title="Last Page">
+            <span class="material-icons text-2xl">last_page</span>
+        </a>
+    <% } %>
+
 </div>
+
+</div>
+
+<script>
+    console.log("script loaded\n");
+    function executeSearch() {
+        console.log("search\n");
+        const query = document.getElementById('searchInput').value;
+        if (!query) {
+            alert("Please enter a search term.");
+            return;
+        }
+
+        // 검색 페이지로 이동
+        location.href = `/search?q=${encodeURIComponent(query)}`;
+    }
+</script>
 
 </body>
 </html>

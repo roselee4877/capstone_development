@@ -32,15 +32,21 @@
     </script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
-    <div class="container mx-auto p-4 md:p-8">
+    <div class="container mx-auto px-4 md:px-12 lg:px-20 py-8 max-w-7xl">
         <header class="flex items-center space-x-4 mb-8">
             <div class="flex items-center space-x-4 flex-grow">
                 <a href="/" class="flex items-center gap-2 bg-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition-colors">
                     <span class="material-icons">home</span>
                 </a>
                 <div class="relative flex-grow">
-                    <input class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search news..." type="text"/>
-                    <button class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg">
+                    <input id="searchInput" 
+                        class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-card-light dark:bg-card-dark focus:outline-none focus:ring-2 focus:ring-primary" 
+                        placeholder="Search by keyword" 
+                        type="text"
+                        onkeyup="if(window.event.keyCode==13){executeSearch()}"/>
+                        
+                    <button onclick="executeSearch()" 
+                            class="absolute right-0 top-0 h-full px-3 flex items-center bg-primary text-white rounded-r-lg hover:bg-indigo-700 transition-colors duration-300">
                         <span class="material-icons">search</span>
                     </button>
                 </div>
@@ -131,46 +137,69 @@
                 
             </main>
 
-            <div id="keywordModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
-                <div class="bg-card-light dark:bg-card-dark max-w-lg w-full rounded-xl shadow-2xl p-6 relative">
-                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                        <span class="material-icons">close</span>
-                    </button>
-                    <h3 id="modalTitle" class="text-xl font-bold mb-4 text-primary"></h3>
-                    <div id="modalContent" class="text-text-light dark:text-text-dark leading-relaxed">
+            <div id="keywordModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-all duration-300" onclick="if(event.target === this) closeModal()">
+                <div class="bg-card-light dark:bg-card-dark max-w-2xl w-full rounded-2xl shadow-2xl flex flex-col max-h-[75vh] overflow-hidden transform transition-all shadow-indigo-500/10">
+                    
+                    <div class="px-6 py-4 border-b border-border-light dark:border-border-dark flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span class="material-icons text-primary">auto_awesome</span>
+                            </div>
+                            <div>
+                                <h3 id="modalTitle" class="text-xl font-bold text-text-light dark:text-text-dark tracking-tight"></h3>
+                                <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium  tracking-wider">Why is this keyword highlighted?</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all group">
+                            <span class="material-icons text-text-secondary-light group-hover:rotate-90 transition-transform duration-300">close</span>
+                        </button>
+                    </div>
+
+                    <div id="modalContent" class="p-8 overflow-y-auto text-text-light dark:text-text-dark leading-relaxed text-lg whitespace-pre-wrap scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                         </div>
                 </div>
             </div>
 
             <script>
-            async function explainKeyword(keyword, label) {
-                const modal = document.getElementById('keywordModal');
-                const title = document.getElementById('modalTitle');
-                const content = document.getElementById('modalContent');
+                async function explainKeyword(keyword, label) {
+                    const modal = document.getElementById('keywordModal');
+                    const title = document.getElementById('modalTitle');
+                    const content = document.getElementById('modalContent');
 
-                // 모달 열기 및 로딩 표시
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                title.innerText = `Keyword: ${keyword}`;
-                content.innerHTML = '<div class="flex justify-center"><span class="animate-spin material-icons">sync</span> 분석 중...</div>';
+                    // 모달 열기 및 로딩 표시
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    title.innerText = `${keyword}`;
+                    content.innerHTML = '<div class="flex justify-center"><span class="animate-spin material-icons">sync</span> Analyzing...</div>';
 
-                try {
-                    const response = await fetch('/api/explain-keyword', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ keyword, label, title: "<%= article.title %>" })
-                    });
-                    const data = await response.json();
-                    content.innerText = data.explanation;
-                } catch (error) {
-                    content.innerText = "설명을 가져오는 중 오류가 발생했습니다.";
+                    // 1. 기사 본문 텍스트 추출 (하이라이트 태그 등을 제외한 순수 텍스트만 가져옴)
+                    const articleElement = document.querySelector('.article-body');
+                    const articleText = articleElement ? articleElement.innerText : "";
+
+                    try {
+                        const response = await fetch('/api/explain-keyword', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            // 2. body에 content(본문) 추가
+                            body: JSON.stringify({ 
+                                keyword: keyword, 
+                                label: label, 
+                                title: "<%= article.title %>",
+                                content: articleText // 추출한 본문 텍스트 전달
+                            })
+                        });
+                        const data = await response.json();
+                        content.innerText = data.explanation;
+                    } catch (error) {
+                        console.error("Error:", error);
+                        content.innerText = "Explanation could not be retrieved.";
+                    }
                 }
-            }
 
-            function closeModal() {
-                document.getElementById('keywordModal').classList.add('hidden');
-                document.getElementById('keywordModal').classList.remove('flex');
-            }
+                function closeModal() {
+                    document.getElementById('keywordModal').classList.add('hidden');
+                    document.getElementById('keywordModal').classList.remove('flex');
+                }
             </script>
 
             <aside class="space-y-8">
@@ -260,5 +289,20 @@
             </aside>
         </div>
     </div>
+
+    <script>
+        console.log("script loaded\n");
+        function executeSearch() {
+            console.log("search\n");
+            const query = document.getElementById('searchInput').value;
+            if (!query) {
+                alert("Please enter a search term.");
+                return;
+            }
+
+            // 검색 페이지로 이동
+            location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+    </script>
 </body>
 </html>
