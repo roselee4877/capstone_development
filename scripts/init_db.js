@@ -47,7 +47,7 @@ const initDB = async () => {
 
         await db.pool.query(`
             CREATE TABLE Log (
-                log_id BIGINT NOT NULL,
+                log_id BIGINT AUTO_INCREMENT,
                 user_id VARCHAR(50) NOT NULL,
                 article_id BIGINT NOT NULL,
                 viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

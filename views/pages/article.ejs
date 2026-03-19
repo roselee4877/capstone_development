@@ -83,54 +83,119 @@
                         </div>
                         
                         <div class="text-lg leading-relaxed space-y-4">
-                            <% 
-                                // 1. 서버에서 전달받은 keywords 배열 사용 (없을 경우를 대비해 빈 배열 기본값)
-                                const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
+                        <% 
+                            const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
+                            let highlightedContent = article.article_content || '';
+                            
+                            //console.log("-----------------------");
 
-                                // 2. 본문 내용 가져오기 (null 방지)
-                                let highlightedContent = article.article_content || '';
+                            let colorClass = "";
+                            const label = article.label; 
+                            if (label === 'Left') colorClass = "bg-blue-200 dark:bg-blue-900/50";
+                            else if (label === 'Right') colorClass = "bg-red-200 dark:bg-red-900/50";
+                            else colorClass = "bg-gray-200 dark:bg-gray-700/50";
 
-                                // 3. article.label에 따른 색상 클래스 결정
-                                let colorClass = "";
-                                const label = article.label; // Left, Center, Right 중 하나
+                            if (highlightedContent && currentKeywords.length > 0) {
+                                // 1. 문장별로 키워드 그룹화
+                                const sentenceMap = new Map();
+                                currentKeywords.forEach(item => {
+                                    const s = (item.sentence || "").trim();
+                                    if (!s) return;
+                                    if (!sentenceMap.has(s)) sentenceMap.set(s, []);
+                                    sentenceMap.get(s).push((item.keyword || "").trim());
 
-                                if (label === 'Left') {
-                                    // 진보(Left): Yellow 계열
-                                    colorClass = "bg-yellow-200 dark:bg-yellow-900/50 border-yellow-400";
-                                } else if (label === 'Right') {
-                                    // 보수(Right): Teal 계열
-                                    colorClass = "bg-teal-200 dark:bg-teal-900/50 border-teal-400";
-                                } else {
-                                    // 중도(Center) 또는 기타: Gray 계열
-                                    colorClass = "bg-gray-200 dark:bg-gray-700/50 border-gray-400";
-                                }
+                                    //console.log(item.keyword, "\n", s, "\n\n");
+                                });
 
-                                // 4. 하이라이트 로직 실행
-                                if (highlightedContent && currentKeywords.length > 0) {
-                                    // 키워드가 긴 것부터 정렬 (짧은 단어가 긴 단어의 일부를 먼저 하이라이트하는 것 방지)
-                                    const sortedKeywords = [...currentKeywords].sort((a, b) => b.length - a.length);
+                                // 2. 문장 길이가 긴 순서대로 처리 (중복 방지)
+                                const sortedSentences = Array.from(sentenceMap.keys()).sort((a, b) => b.length - a.length);
 
-                                    sortedKeywords.forEach(word => {
-                                        if (word && word.trim() !== '') {
-                                            // 정규식 특수문자 이스케이프 처리
-                                            const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                                            const regex = new RegExp(`(${escapedWord})`, 'gi');
+                                sortedSentences.forEach(fullSentence => {
+                                    const keywords = sentenceMap.get(fullSentence);
+                                    
+                                    // 정규식 유연화 (기존 로직 유지)
+                                    const flexibleSentence = fullSentence
+                                        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                                        .replace(/[^a-zA-Z0-9\s]/g, '.?')
+                                        .replace(/\s+/g, '([\\s\\n\\r]|<br\\s*\\/?>)+');
+
+                                    try {
+                                        const sentenceRegex = new RegExp(flexibleSentence, 'gi');
+
+                                        highlightedContent = highlightedContent.replace(sentenceRegex, (match) => {
+                                            let updatedMatch = match;
                                             
-                                            // 위에서 결정된 colorClass를 사용하여 replace 실행
-                                            highlightedContent = highlightedContent.replace(
-                                                regex, 
-                                                `<span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight" 
-                                                    onclick="explainKeyword('${escapedWord}', '${label}')">$1</span>`
-                                            );
-                                        }
-                                    });
-                                }
-                            %>
+                                            // 해당 문장 안에 포함된 모든 키워드에 대해 순차적으로 replace 수행
+                                            keywords.forEach(word => {
+                                                const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                                const wordRegex = new RegExp(`(${escapedWord})`, 'gi');
+                                                const safeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+
+                                                /*updatedMatch = updatedMatch.replace(wordRegex, (w) => {
+                                                    // 이미 하이라이트된 단어라면 건너뛰기 (중복 방지)
+                                                    if (w.includes('keyword-highlight')) return w;
+                                                    
+                                                    return `<span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight" 
+                                                            onclick="explainKeyword('${safeWord}', '${label}')">${w}</span>`;
+                                                });*/
+
+                                                updatedMatch = updatedMatch.replace(wordRegex, (w) => {
+                                                    if (w.includes('keyword-highlight')) return w;
+                                                    
+                                                    const uniqueId = `expander-${Math.random().toString(36).substr(2, 9)}`;
+                                                    const currentSafeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                                                    
+                                                    let descriptionColorClass = "";
+                                                    if (label === 'Left') {
+                                                        descriptionColorClass = "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900";
+                                                    } else if (label === 'Right') {
+                                                        descriptionColorClass = "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900";
+                                                    } else {
+                                                        descriptionColorClass = "bg-gray-100 dark:bg-gray-800/40 border-gray-100 dark:border-gray-700";
+                                                    }
+                                                    
+                                                    return `
+                                                        <span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight hover:text-primary transition-colors inline" 
+                                                            onclick="toggleExpander('${uniqueId}', '${currentSafeWord}')">
+                                                            ${w}
+                                                        </span>
+                                                        <div id="${uniqueId}" class="expander-content hidden w-full overflow-hidden transition-all duration-300 ease-in-out">
+                                                            <div class="mb-1 pt-2 pb-2 px-5 rounded-xl shadow-sm border ${descriptionColorClass}">
+                                                                <div class="flex justify-between items-center mb-1">
+                                                                    <h4 class="text-base font-bold text-text-light dark:text-text-dark leading-none">
+                                                                        ${w}
+                                                                    </h4>
+                                                                    <button onclick="event.stopPropagation(); closeExpander('${uniqueId}')" class="text-gray-400 hover:text-gray-600 p-1">
+                                                                        <span class="material-icons text-sm text-gray-400 hover:text-gray-600 cursor-pointer">close</span>
+                                                                    </button>
+                                                                </div>
+                                                                <p class="text-sm leading-relaxed text-text-light dark:text-text-dark font-normal description-text opacity-90">
+                                                                    <span class="flex items-center gap-2 italic">
+                                                                        <span class="animate-pulse w-2 h-2 bg-primary rounded-full"></span>
+                                                                        Analyzing context...
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+                                                        </div>`;
+                                                });
+                                                
+                                            });
+                                            return updatedMatch;
+                                        });
+                                    } catch (e) {
+                                        console.error("정규식 오류:", fullSentence);
+                                    }
+                                });
+                            }
+                        %>
+
 
                             <div class="text-lg leading-relaxed space-y-4 article-body">
                                 <%- highlightedContent %>
                             </div>
                         </div>
+
+                        
                     </div>
                 </article>
 
@@ -160,149 +225,111 @@
                 </div>
             </div>
 
-            <script>
-                async function explainKeyword(keyword, label) {
-                    const modal = document.getElementById('keywordModal');
-                    const title = document.getElementById('modalTitle');
-                    const content = document.getElementById('modalContent');
-
-                    // 모달 열기 및 로딩 표시
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                    title.innerText = `${keyword}`;
-                    content.innerHTML = '<div class="flex justify-center"><span class="animate-spin material-icons">sync</span> Analyzing...</div>';
-
-                    // 1. 기사 본문 텍스트 추출 (하이라이트 태그 등을 제외한 순수 텍스트만 가져옴)
-                    const articleElement = document.querySelector('.article-body');
-                    const articleText = articleElement ? articleElement.innerText : "";
-
-                    try {
-                        const response = await fetch('/api/explain-keyword', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            // 2. body에 content(본문) 추가
-                            body: JSON.stringify({ 
-                                keyword: keyword, 
-                                label: label, 
-                                title: "<%= article.title %>",
-                                content: articleText // 추출한 본문 텍스트 전달
-                            })
-                        });
-                        const data = await response.json();
-                        content.innerText = data.explanation;
-                    } catch (error) {
-                        console.error("Error:", error);
-                        content.innerText = "Explanation could not be retrieved.";
-                    }
-                }
-
-                function closeModal() {
-                    document.getElementById('keywordModal').classList.add('hidden');
-                    document.getElementById('keywordModal').classList.remove('flex');
-                }
-            </script>
 
             <aside class="space-y-8">
                 <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <h3 class="text-lg font-semibold mb-4">Political Bias</h3>
-                    <div class="flex space-x-2 text-sm">
+                    <div class="flex space-x-2 text-sm mb-4">
                         <% if (article.label === 'Right') { %>
-                            <span class="bg-teal-200 text-teal-800 dark:bg-teal-900 dark:text-teal-300 px-2 py-1 rounded-full font-medium">Con</span>
+                            <span class="bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">Con</span>
                         <% } else if (article.label === 'Left') { %>
-                            <span class="bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full font-medium">Pro</span>
+                            <span class="bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Pro</span>
                         <% } else { %>
                             <span class="bg-gray-200 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">Mod</span>
                         <% } %>
                     </div>
 
-        
+                    <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-1">
+                        <button onclick="getBiasExplanation()" id="ai-btn" 
+                            class="w-full py-0.5 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-gray-100 text-base font-semibold transition-colors flex items-center justify-center gap-1.5">
+                            <span>Why this bias?</span>
+                            <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 6L0 0.999999L10 1L5 6Z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="bias-explanation" class="mt-2 text-sm text-gray-600 dark:text-gray-400 hidden leading-relaxed pt-2">
+                        </div>
                 </div>
 
-                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-yellow-500">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-yellow-500">Progressive View</h3>
+                <div class="bg-card-light dark:bg-card-dark px-6 pt-5 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-text-light dark:text-text-dark flex items-center gap-2">
+                            Comparing Perspectives
+                        </h3>
                     </div>
 
-                    <div class="space-y-4">
-                        <% if (recommendations.Left && recommendations.Left.length > 0) { %>
-                            <% recommendations.Left.forEach(rec => { %>
-                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
-                                    <div class="flex-grow">
-                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                            <%= rec.title %>
-                                        </h4>
-                                    </div>
-                                </a>
-                            <% }) %>
-                        <% } else { %>
-                            <p class="text-sm text-gray-400">empty</p>
-                        <% } %>
+                    <div class="space-y-6">
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-300 dark:bg-blue-600 rounded-full opacity-80"></div>
+                            <div class="flex flex-col">
+                                <div class="space-y-1">
+                                    <% if (recommendations.Left && recommendations.Left.length > 0) { %>
+                                        <% recommendations.Left.forEach(rec => { %>
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-2">
+                                                <a href="/article/<%= rec.article_id %>" class="block group">
+                                                    <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                                                        <%= rec.title %>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-[11px] text-gray-400 py-2 px-1 italic">no articles available</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-300 dark:bg-gray-600 rounded-full opacity-80"></div>
+                            <div class="flex flex-col">
+                                <div class="space-y-1">
+                                    <% if (recommendations.Center && recommendations.Center.length > 0) { %>
+                                        <% recommendations.Center.forEach(rec => { %>
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
+                                                <a href="/article/<%= rec.article_id %>" class="block group">
+                                                    <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                                                        <%= rec.title %>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-[11px] text-gray-400 py-2 px-1 italic">no articles available</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-300 dark:bg-red-600 rounded-full opacity-80"></div>
+                            <div class="flex flex-col">
+                                <div class="space-y-1">
+                                    <% if (recommendations.Right && recommendations.Right.length > 0) { %>
+                                        <% recommendations.Right.forEach(rec => { %>
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
+                                                <a href="/article/<%= rec.article_id %>" class="block group">
+                                                    <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                                                        <%= rec.title %>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-[11px] text-gray-400 py-2 px-1 italic">no articles available</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
-                
-                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-gray-500">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-gray-500">Center View</h3>
-                    </div>
-
-                    <div class="space-y-4">
-                        <% if (recommendations.Center && recommendations.Center.length > 0) { %>
-                            <% recommendations.Center.forEach(rec => { %>
-                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
-                                    <div class="flex-grow">
-                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                            <%= rec.title %>
-                                        </h4>
-                                    </div>
-                                </a>
-                            <% }) %>
-                        <% } else { %>
-                            <p class="text-sm text-gray-400">empty</p>
-                        <% } %>
-                    </div>
-                </div>
-
-                <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md border-t-4 border-teal-500">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-teal-500">Conservative View</h3>
-                    </div>
-
-                    <div class="space-y-4">
-                        <% if (recommendations.Right && recommendations.Right.length > 0) { %>
-                            <% recommendations.Right.forEach(rec => { %>
-                                <a class="flex items-center gap-4 group" href="/article/<%= rec.article_id %>">
-                                    <div class="flex-grow">
-                                        <h4 class="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                                            <%= rec.title %>
-                                        </h4>
-                                    </div>
-                                </a>
-                            <% }) %>
-                        <% } else { %>
-                            <p class="text-sm text-gray-400">empty</p>
-                        <% } %>
-                    </div>
-                </div>
-                
                 
 
             </aside>
         </div>
     </div>
 
-    <script>
-        console.log("script loaded\n");
-        function executeSearch() {
-            console.log("search\n");
-            const query = document.getElementById('searchInput').value;
-            if (!query) {
-                alert("Please enter a search term.");
-                return;
-            }
-
-            // 검색 페이지로 이동
-            location.href = `/search?q=${encodeURIComponent(query)}`;
-        }
-    </script>
+    <script src="/utils.js"></script>
 </body>
 </html>
