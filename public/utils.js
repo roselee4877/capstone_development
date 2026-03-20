@@ -181,3 +181,67 @@ function logClick(articleId) {
     // 2. 전송
     navigator.sendBeacon('/api/log-click', blob);
 }
+
+function openSplitView(event, url) {
+    event.preventDefault();
+
+    const container = document.getElementById('view-container');
+    const leftView = document.getElementById('left-view');
+    const rightView = document.getElementById('right-view');
+    const iframe = document.getElementById('right-iframe');
+    const fullViewBtn = document.getElementById('full-view-btn');
+    const aside = document.querySelector('aside');
+
+
+    // URL에 파라미터를 붙입니다. (이미 ?가 있다면 &로 연결)
+    const separator = url.includes('?') ? '&' : '?';
+    const splitUrl = url + separator + "isSplit=true";
+
+    // 1. iframe에 파라미터가 붙은 URL 로드
+    iframe.src = splitUrl;
+
+    // 1. 사이드바 숨기기
+    if (aside) aside.style.display = 'none';
+    
+    // 2. 메인 컨테이너를 전체 너비(3컬럼)로 확장
+    container.classList.remove('lg:col-span-2');
+    container.classList.add('lg:col-span-3');
+
+    // 3. 왼쪽 창 너비 조정
+    leftView.style.width = '50%';
+
+    // 4. 오른쪽 창 표시 및 너비 조정
+    rightView.classList.remove('hidden'); // hidden 클래스 제거
+    rightView.style.width = '50%';
+    rightView.style.display = 'flex'; // hidden이었던 것을 flex로 강제 전환
+
+    // 5. iframe 로드
+    //iframe.src = url;
+    
+    // 6. 전체보기 버튼 링크 설정
+    if (fullViewBtn) {
+        fullViewBtn.onclick = () => window.location.href = url;
+    }
+}
+
+function closeSplitView() {
+    const container = document.getElementById('view-container');
+    const leftView = document.getElementById('left-view');
+    const rightView = document.getElementById('right-view');
+    const aside = document.querySelector('aside');
+
+    // 1. 사이드바 복구
+    if (aside) aside.style.display = 'block';
+
+    // 2. 메인 컨테이너 원래대로 (2컬럼)
+    container.classList.remove('lg:col-span-3');
+    container.classList.add('lg:col-span-2');
+
+    // 3. 레이아웃 초기화
+    leftView.style.width = '100%';
+    rightView.style.width = '0';
+    rightView.style.display = 'none';
+    
+    // 4. iframe 비우기 (메모리 및 소리 재생 방지)
+    document.getElementById('right-iframe').src = "about:blank";
+}

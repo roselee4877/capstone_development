@@ -10,6 +10,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const getArticleDetail = async (req, res, next) => {
     try {
             const articleId = req.params.id; // URL에서 ID 추출
+            const isSplit = req.query.isSplit; // URL의 ?isSplit=true를 읽어옴
     
             // DB에서 해당 ID의 기사 한 개만 가져오기
             const [rows] = await db.pool.query('SELECT * FROM Article WHERE article_id = ?', [articleId]);
@@ -51,7 +52,8 @@ const getArticleDetail = async (req, res, next) => {
                     article: article,
                     title: article.title,
                     keywords: keywordsData,
-                    recommendations: recommendations 
+                    recommendations: recommendations,
+                    isSplit: isSplit
                 });
             } else {
                 res.status(404).send('기사를 찾을 수 없습니다.');
