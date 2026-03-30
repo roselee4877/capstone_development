@@ -29,7 +29,16 @@ const getArticleDetail = async (req, res, next) => {
                     keyword: row.keyword,
                     sentence: row.sentence
                 }));
-    
+
+                //정치성향 확률 가져오기
+                const stats = {
+                    Left: article.left_percent,
+                    LeanLeft: article.lean_left_percent,
+                    Center: article.center_percent,
+                    LeanRight: article.lean_right_percent,
+                    Right: article.right_percent
+                };
+
                 // 3. 추천 기사 가져오기 (Recommendation + Article JOIN)
                 // 주제가 비슷하면서 다른 관점(label)을 가진 기사들을 가져옵니다.
                 const [recommendationRows] = await db.pool.query(`
@@ -42,10 +51,19 @@ const getArticleDetail = async (req, res, next) => {
                 // 4. 추천 기사를 성향(label)별로 그룹화
                 // EJS에서 사용하기 쉽게 객체 형태로 정리합니다.
                 const recommendations = {
-                    Left: recommendationRows.filter(r => r.label === 'Left'),
-                    Center: recommendationRows.filter(r => r.label === 'Center'),
-                    Right: recommendationRows.filter(r => r.label === 'Right')
+                    Left: recommendationRows.filter(r => r.label == "Left"),
+                    LeanLeft: recommendationRows.filter(r => r.label == "Lean Left"),
+                    Center: recommendationRows.filter(r => r.label == "Center"),
+                    LeanRight: recommendationRows.filter(r => r.label == "Lean Right"),
+                    Right: recommendationRows.filter(r => r.label == "Right")
                 };
+
+                console.log("---------- 추천 데이터 집계 결과 ----------");
+                Object.entries(recommendations).forEach(([label, list]) => {
+                    console.log(`${label.padEnd(12)} : ${list.length}개 발견`);
+                });
+                console.log("-----------------------------------------");
+
     
                 // 상세 페이지(article.ejs) 렌더링
                 res.render('pages/article', { 
@@ -53,7 +71,8 @@ const getArticleDetail = async (req, res, next) => {
                     title: article.title,
                     keywords: keywordsData,
                     recommendations: recommendations,
-                    isSplit: isSplit
+                    isSplit: isSplit,
+                    stats: stats
                 });
             } else {
                 res.status(404).send('기사를 찾을 수 없습니다.');

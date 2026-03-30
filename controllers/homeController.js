@@ -6,6 +6,8 @@ const getHomePage = async (req, res, next) => {
             const page = parseInt(req.query.page) || 1; // 현재 페이지 (기본값 1)
             const limit = 10; // 한 페이지에 보여줄 개수
             const offset = (page - 1) * limit;
+            const now = new Date();
+            const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); // 10분 전 시간 계산
     
             // 1. 해당 페이지의 기사만 가져오기
             const [articles] = await db.query(
@@ -26,10 +28,9 @@ const getHomePage = async (req, res, next) => {
             
             // 2. 사용자 성향 통계 가져오기 (예시: 세션의 user_id 사용)
             let stats = {
-                weekly: { progressive: 0, moderate: 0, conservative: 0 },
-                total: { progressive: 0, moderate: 0, conservative: 0 }
+                weekly: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
+                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
             };
-
             if (userId) {
                 const [weekly_rows] = await db.query(`
                     SELECT 
@@ -55,44 +56,54 @@ const getHomePage = async (req, res, next) => {
                 let wSum = 0; // 주간 합계
                 const counts = {
                     Left: { t: 0, w: 0 },
-                    Moderate: { t: 0, w: 0 },
+                    LeanLeft: { t: 0, w: 0 },
+                    Center: { t: 0, w: 0 },
+                    LeanRight: { t: 0, w: 0 },
                     Right: { t: 0, w: 0 }
                 };
 
                 weekly_rows.forEach(row => {
                     if (row.label === 'Left') counts.Left.w = row.weekly_count;
-                    else if (row.label === 'Center') counts.Moderate.w = row.weekly_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.w = row.weekly_count;
+                    else if (row.label === 'Center') counts.Center.w = row.weekly_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.w = row.weekly_count;
                     else if (row.label === 'Right') counts.Right.w = row.weekly_count;
                     wSum += row.weekly_count;
                 });
 
                 total_rows.forEach(row => {
                     if (row.label === 'Left') counts.Left.t = row.total_count;
-                    else if (row.label === 'Center') counts.Moderate.t = row.total_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.t = row.total_count;
+                    else if (row.label === 'Center') counts.Center.t = row.total_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.t = row.total_count;
                     else if (row.label === 'Right') counts.Right.t = row.total_count;
                     tSum += row.total_count;
                 });
 
-                console.log(counts.Left, counts.Moderate, counts.Right);
+                console.log(counts.Left, counts.LeanLeft, counts.Center, counts.LeanRight, counts.Right);
 
                 // 퍼센트 계산 함수
                 const getPct = (count, total) => total > 0 ? Math.round((count / total) * 100) : 0;
 
                 stats = {
                     weekly: {
-                        progressive: getPct(counts.Left.w, wSum),
-                        moderate: getPct(counts.Moderate.w, wSum),
-                        conservative: getPct(counts.Right.w, wSum)
+                        Left: getPct(counts.Left.w, wSum),
+                        LeanLeft: getPct(counts.LeanLeft.w, wSum),
+                        Center: getPct(counts.Center.w, wSum),
+                        LeanRight: getPct(counts.LeanRight.w, wSum),
+                        Right: getPct(counts.Right.w, wSum)
                     },
                     total: {
-                        progressive: getPct(counts.Left.t, tSum),
-                        moderate: getPct(counts.Moderate.t, tSum),
-                        conservative: getPct(counts.Right.t, tSum)
+                        Left: getPct(counts.Left.t, tSum),
+                        LeanLeft: getPct(counts.LeanLeft.t, tSum),
+                        Center: getPct(counts.Center.t, tSum),
+                        LeanRight: getPct(counts.LeanRight.t, tSum),
+                        Right: getPct(counts.Right.t, tSum)
                     }
                 };
 
-                console.log("===== User Political Stats Debug =====");
-                console.dir(stats, { depth: null, colors: true });  
+                //console.log("===== User Political Stats Debug =====");
+                //console.dir(stats, { depth: null, colors: true });  
             }
 
             // 3. [추가] 최근 본 기사 5개 가져오기
@@ -127,6 +138,7 @@ const getHomePage = async (req, res, next) => {
 };
 
 const getSearchResults = async (req, res, next) => {
+    const userId = req.session.userId; // 세션에서 userId 가져오기
     const query = req.query.q || "";
     const page = parseInt(req.query.page) || 1; // 현재 페이지 번호 (기본값 1)
     const limit = 10; // 한 페이지에 보여줄 기사 수
@@ -179,6 +191,100 @@ const getSearchResults = async (req, res, next) => {
             startPage = Math.max(1, endPage - maxDisplayPages + 1);
         }
 
+        // 2. 사용자 성향 통계 가져오기 (예시: 세션의 user_id 사용)
+            let stats = {
+                weekly: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
+                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
+            };
+            if (userId) {
+                const [weekly_rows] = await db.query(`
+                    SELECT 
+                        a.label,
+                        COUNT(CASE WHEN l.viewed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as weekly_count
+                    FROM Log l
+                    JOIN Article a ON l.article_id = a.article_id
+                    WHERE l.user_id = ?
+                    GROUP BY a.label
+                `, [userId]);
+
+                const [total_rows] = await db.query(`
+                    SELECT 
+                        a.label,
+                        COUNT(*) as total_count
+                    FROM Log l
+                    JOIN Article a ON l.article_id = a.article_id
+                    WHERE l.user_id = ?
+                    GROUP BY a.label
+                `, [userId]);
+
+                let tSum = 0; // 전체 합계
+                let wSum = 0; // 주간 합계
+                const counts = {
+                    Left: { t: 0, w: 0 },
+                    LeanLeft: { t: 0, w: 0 },
+                    Center: { t: 0, w: 0 },
+                    LeanRight: { t: 0, w: 0 },
+                    Right: { t: 0, w: 0 }
+                };
+
+                weekly_rows.forEach(row => {
+                    if (row.label === 'Left') counts.Left.w = row.weekly_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.w = row.weekly_count;
+                    else if (row.label === 'Center') counts.Center.w = row.weekly_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.w = row.weekly_count;
+                    else if (row.label === 'Right') counts.Right.w = row.weekly_count;
+                    wSum += row.weekly_count;
+                });
+
+                total_rows.forEach(row => {
+                    if (row.label === 'Left') counts.Left.t = row.total_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.t = row.total_count;
+                    else if (row.label === 'Center') counts.Center.t = row.total_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.t = row.total_count;
+                    else if (row.label === 'Right') counts.Right.t = row.total_count;
+                    tSum += row.total_count;
+                });
+
+                console.log(counts.Left, counts.LeanLeft, counts.Center, counts.LeanRight, counts.Right);
+
+                // 퍼센트 계산 함수
+                const getPct = (count, total) => total > 0 ? Math.round((count / total) * 100) : 0;
+
+                stats = {
+                    weekly: {
+                        Left: getPct(counts.Left.w, wSum),
+                        LeanLeft: getPct(counts.LeanLeft.w, wSum),
+                        Center: getPct(counts.Center.w, wSum),
+                        LeanRight: getPct(counts.LeanRight.w, wSum),
+                        Right: getPct(counts.Right.w, wSum)
+                    },
+                    total: {
+                        Left: getPct(counts.Left.t, tSum),
+                        LeanLeft: getPct(counts.LeanLeft.t, tSum),
+                        Center: getPct(counts.Center.t, tSum),
+                        LeanRight: getPct(counts.LeanRight.t, tSum),
+                        Right: getPct(counts.Right.t, tSum)
+                    }
+                };
+
+                //console.log("===== User Political Stats Debug =====");
+                //console.dir(stats, { depth: null, colors: true });  
+            }
+
+            // 3. [추가] 최근 본 기사 5개 가져오기
+            let recentLogs = [];
+            if (userId) {
+                [recentLogs] = await db.query(
+                    `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at 
+                    FROM Log l
+                    JOIN Article a ON l.article_id = a.article_id
+                    WHERE l.user_id = ?
+                    ORDER BY l.viewed_at DESC
+                    LIMIT 5`,
+                    [userId]
+                );
+            }
+
         // 6. EJS 렌더링 (모든 변수를 한꺼번에 전달)
         res.render('pages/article-list.ejs', { 
             articles: rows, 
@@ -186,9 +292,10 @@ const getSearchResults = async (req, res, next) => {
             currentPage: page,
             totalPages: totalPages,
             startPage: startPage,
-            endPage: endPage
+            endPage: endPage,
+            stats: stats,
+            recentLogs: recentLogs // 최근 본 기사 데이터 추가
         });
-
     } catch (error) {
         console.error("Search Error:", error);
         res.status(500).send("검색 중 오류가 발생했습니다.");

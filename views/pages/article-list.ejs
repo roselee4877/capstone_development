@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 <script>
+    const colors = tailwind.colors;
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -20,7 +21,13 @@
                         "text-light": "#111827",
                         "text-dark": "#F9FAFB",
                         "subtext-light": "#6B7280",
-                        "subtext-dark": "#9CA3AF"
+                        "subtext-dark": "#9CA3AF",
+                        
+                        "pol-left": colors.blue[400],
+                        "pol-lean-left": colors.blue[200],
+                        "pol-center": colors.gray[300],
+                        "pol-lean-right": colors.red[200],
+                        "pol-right": colors.red[400],
                     },
                     fontFamily: {
                         display: ["Noto Sans KR", "sans-serif"],
@@ -76,15 +83,19 @@
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 last:border-b-0">
                         <div class="flex space-x-6">
                             <div class="flex-grow">
-                                <div class="flex flex-col mb-2">
+                                <div class="flex flex-col">
                                     <div class="flex items-center gap-3">
                                         <div class="flex space-x-2 text-sm shrink-0">
                                             <% if (article.label === 'Right') { %>
-                                                <span class="bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">Con</span>
+                                                <span class="bg-pol-right text-white dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">RGT</span>
+                                            <% } else if (article.label === 'Lean Right') { %>
+                                                <span class="bg-pol-lean-right text-white dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">L-R</span>
+                                            <% }else if (article.label === 'Lean Left') { %>
+                                                <span class="bg-pol-lean-left text-white dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">L-L</span>
                                             <% } else if (article.label === 'Left') { %>
-                                                <span class="bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Pro</span>
+                                                <span class="bg-pol-left text-white dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">LFT</span>                            
                                             <% } else { %>
-                                                <span class="bg-gray-200 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">Mod</span>
+                                                <span class="bg-pol-center text-white dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">CEN</span>
                                             <% } %>
                                         </div>
                                         
@@ -117,33 +128,50 @@
             
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
                 
-                <div class="flex flex-col items-center justify-center bg-blue-300 border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.weekly.progressive %>%">
-                    <% if (stats.weekly.progressive > 5) { %> 
-                        <span>pro</span>
-                        <span><%= stats.weekly.progressive %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.weekly.Left %>%">
+                    <% if (stats.weekly.Left > 5) { %> 
+                        <span>Left</span>
+                        <span><%= stats.weekly.Left %>%</span>
                     <% } %>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-gray-300 border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.weekly.moderate %>%">
-                    <% if (stats.weekly.moderate > 5) { %>
-                        <span>mod</span>
-                        <span><%= stats.weekly.moderate %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.weekly.LeanLeft %>%">
+                    <% if (stats.weekly.LeanLeft > 5) { %> 
+                        <span>Lean Left</span>
+                        <span><%= stats.weekly.LeanLeft %>%</span>
                     <% } %>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-red-300 transition-all duration-500" 
-                    style="width: <%= stats.weekly.conservative %>%">
-                    <% if (stats.weekly.conservative > 5) { %>
-                        <span>con</span>
-                        <span><%= stats.weekly.conservative %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.weekly.Center %>%">
+                    <% if (stats.weekly.Center > 5) { %>
+                        <span>Center</span>
+                        <span><%= stats.weekly.Center %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500" 
+                    style="width: <%= stats.weekly.LeanRight %>%">
+                    <% if (stats.weekly.LeanRight > 5) { %>
+                        <span>Lean Right</span>
+                        <span><%= stats.weekly.LeanRight %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500" 
+                    style="width: <%= stats.weekly.Right %>%">
+                    <% if (stats.weekly.Right > 5) { %>
+                        <span>Right</span>
+                        <span><%= stats.weekly.Right %>%</span>
                     <% } %>
                 </div>
 
             </div>
 
-            <% if (stats.weekly.progressive === 0 && stats.weekly.moderate === 0 && stats.weekly.conservative === 0) { %>
+            <% if (stats.weekly.Left === 0 && stats.weekly.LeanLeft === 0 && 
+            stats.weekly.Center === 0 && stats.weekly.LeanRight === 0 && stats.weekly.Right === 0) { %>
                 <p class="text-[10px] text-center mt-2 text-subtext-light">기록된 활동 데이터가 없습니다.</p>
             <% } %>
         
@@ -152,33 +180,50 @@
             <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">My Overall Political Lean</h3>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
                 
-                <div class="flex flex-col items-center justify-center bg-blue-300 border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.total.progressive %>%">
-                    <% if (stats.total.progressive > 5) { %> 
-                        <span>pro</span>
-                        <span><%= stats.total.progressive %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.total.Left %>%">
+                    <% if (stats.total.Left > 5) { %> 
+                        <span>Left</span>
+                        <span><%= stats.total.Left %>%</span>
                     <% } %>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-gray-300 border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.total.moderate %>%">
-                    <% if (stats.total.moderate > 5) { %>
-                        <span>mod</span>
-                        <span><%= stats.total.moderate %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.total.LeanLeft %>%">
+                    <% if (stats.total.LeanLeft > 5) { %> 
+                        <span>Lean Left</span>
+                        <span><%= stats.total.LeanLeft %>%</span>
                     <% } %>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-red-300 transition-all duration-500" 
-                    style="width: <%= stats.total.conservative %>%">
-                    <% if (stats.total.conservative > 5) { %>
-                        <span>con</span>
-                        <span><%= stats.total.conservative %>%</span>
+                <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.total.Center %>%">
+                    <% if (stats.total.Center > 5) { %>
+                        <span>Center</span>
+                        <span><%= stats.total.Center %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500" 
+                    style="width: <%= stats.total.LeanRight %>%">
+                    <% if (stats.total.LeanRight > 5) { %>
+                        <span>Lean Right</span>
+                        <span><%= stats.total.LeanRight %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500" 
+                    style="width: <%= stats.total.Right %>%">
+                    <% if (stats.total.Right > 5) { %>
+                        <span>Right</span>
+                        <span><%= stats.total.Right %>%</span>
                     <% } %>
                 </div>
 
             </div>
 
-            <% if (stats.total.progressive === 0 && stats.total.moderate === 0 && stats.total.conservative === 0) { %>
+            <% if (stats.total.Left === 0 && stats.total.LeanLeft === 0 && 
+            stats.total.Center === 0 && stats.total.LeanRight === 0 && stats.total.Right === 0) { %>
                 <p class="text-[10px] text-center mt-2 text-subtext-light">기록된 활동 데이터가 없습니다.</p>
             <% } %>
         </div>
@@ -196,12 +241,16 @@
                                 <div class="flex items-center gap-3"> 
                                     
                                     <div class="shrink-0">
-                                        <% if (log.label === 'Right') { %>
-                                            <span class="block w-3 h-3 bg-red-300 dark:bg-red-400 rounded-full shadow-sm"></span>
-                                        <% } else if (log.label === 'Left') { %>
-                                            <span class="block w-3 h-3 bg-blue-300 dark:bg-blue-400 rounded-full shadow-sm"></span>
+                                        <% if (log.label == "Left") { %>
+                                            <span class="block w-3 h-3 bg-pol-left dark:bg-red-400 rounded-full shadow-sm"></span>
+                                        <% } else if (log.label == "Lean Left") { %>
+                                            <span class="block w-3 h-3 bg-pol-lean-left dark:bg-blue-400 rounded-full shadow-sm"></span>
+                                        <% } else if (log.label == "Lean Right") { %>
+                                            <span class="block w-3 h-3 bg-pol-lean-right dark:bg-blue-400 rounded-full shadow-sm"></span>
+                                        <% } else if (log.label == "Right") { %>
+                                            <span class="block w-3 h-3 bg-pol-right dark:bg-red-400 rounded-full shadow-sm"></span>
                                         <% } else { %>
-                                            <span class="block w-3 h-3 bg-gray-300 dark:bg-gray-500 rounded-full shadow-sm"></span>
+                                            <span class="block w-3 h-3 bg-pol-center dark:bg-gray-500 rounded-full shadow-sm"></span>
                                         <% } %>
                                     </div>
 

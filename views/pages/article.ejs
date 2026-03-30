@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <script>
+        const colors = tailwind.colors;
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -24,6 +25,12 @@
                         "text-secondary-dark": "#9CA3AF",
                         "border-light": "#E5E7EB",
                         "border-dark": "#4B5563",
+
+                        "pol-left": colors.blue[400],
+                        "pol-lean-left": colors.blue[200],
+                        "pol-center": colors.gray[300],
+                        "pol-lean-right": colors.red[200],
+                        "pol-right": colors.red[400],
                     },
                     fontFamily: { display: ["Noto Sans KR", "sans-serif"] },
                 },
@@ -84,22 +91,20 @@
                                 <span class="hidden sm:inline">|</span>
                             <% } %>
 
-                            <% if (article.created_at) { %>
-                                <span><%= (article.created_at instanceof Date) ? article.created_at.toLocaleDateString() : article.created_at %></span>
-                            <% } %>
                         </div>
                         
                         <div class="text-lg leading-relaxed space-y-4">
                         <% 
                             const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
                             let highlightedContent = article.article_content || '';
-                            
-                            //console.log("-----------------------");
+
 
                             let colorClass = "";
                             const label = article.label; 
-                            if (label === 'Left') colorClass = "bg-blue-200 dark:bg-blue-900/50";
-                            else if (label === 'Right') colorClass = "bg-red-200 dark:bg-red-900/50";
+                            if (label === 'Left') colorClass = "bg-blue-300 dark:bg-blue-900/50";
+                            else if (label === 'Right') colorClass = "bg-red-300 dark:bg-red-900/50";
+                            else if (label === 'Lean Left') colorClass = "bg-blue-200 dark:bg-blue-900/50";
+                            else if (label === 'Lean Right') colorClass = "bg-red-200 dark:bg-red-900/50";
                             else colorClass = "bg-gray-200 dark:bg-gray-700/50";
 
                             if (highlightedContent && currentKeywords.length > 0) {
@@ -152,11 +157,16 @@
                                                     const uniqueId = `expander-${Math.random().toString(36).substr(2, 9)}`;
                                                     const currentSafeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                                                     
+                                                    //여기는 대체 뭐때매 있는거지????????????
                                                     let descriptionColorClass = "";
-                                                    if (label === 'Left') {
-                                                        descriptionColorClass = "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900";
-                                                    } else if (label === 'Right') {
-                                                        descriptionColorClass = "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900";
+                                                    if (label == 'Left') {
+                                                        descriptionColorClass = "bg-blue-100 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900";
+                                                    } else if (label == "Lean Left") {
+                                                        descriptionColorClass = "bg-blue-100 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900";
+                                                    } else if (label == "Lean Right") {
+                                                        descriptionColorClass = "bg-red-100 dark:bg-red-950/20 border-red-100 dark:border-red-900";
+                                                    } else if (label == 'Right') {
+                                                        descriptionColorClass = "bg-red-100 dark:bg-red-950/20 border-red-100 dark:border-red-900";
                                                     } else {
                                                         descriptionColorClass = "bg-gray-100 dark:bg-gray-800/40 border-gray-100 dark:border-gray-700";
                                                     }
@@ -246,14 +256,48 @@
             <aside class="space-y-8">
                 <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
                     <h3 class="text-lg font-semibold mb-4">Political Bias</h3>
-                    <div class="flex space-x-2 text-sm mb-4">
-                        <% if (article.label === 'Right') { %>
-                            <span class="bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded-full font-medium">Con</span>
-                        <% } else if (article.label === 'Left') { %>
-                            <span class="bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Pro</span>
-                        <% } else { %>
-                            <span class="bg-gray-200 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-1 rounded-full font-medium">Mod</span>
-                        <% } %>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
+                        
+                        <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
+                            style="width: <%= stats.Left %>%">
+                            <% if (stats.Left > 5) { %> 
+                                <span>Left</span>
+                                <span><%= stats.Left %>%</span>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500" 
+                            style="width: <%= stats.LeanLeft %>%">
+                            <% if (stats.LeanLeft > 5) { %> 
+                                <span>Lean Left</span>
+                                <span><%= stats.LeanLeft %>%</span>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500" 
+                            style="width: <%= stats.Center %>%">
+                            <% if (stats.Center > 5) { %>
+                                <span>Center</span>
+                                <span><%= stats.Center %>%</span>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500" 
+                            style="width: <%= stats.LeanRight %>%">
+                            <% if (stats.LeanRight > 5) { %>
+                                <span>Lean Right</span>
+                                <span><%= stats.LeanRight %>%</span>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500" 
+                            style="width: <%= stats.Right %>%">
+                            <% if (stats.Right > 5) { %>
+                                <span>Right</span>
+                                <span><%= stats.Right %>%</span>
+                            <% } %>
+                        </div>
+
                     </div>
 
                     <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-1">
@@ -278,12 +322,12 @@
                     </div>
 
                     <div class="space-y-6">
-                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-300 dark:bg-blue-600 rounded-full opacity-80"></div>
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-pol-left dark:bg-blue-600 rounded-full opacity-80"></div>
                             <div class="flex flex-col">
                                 <div class="space-y-1">
                                     <% if (recommendations.Left && recommendations.Left.length > 0) { %>
                                         <% recommendations.Left.forEach(rec => { %>
-                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-2">
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
                                                 <a href="/article/<%= rec.article_id %>" 
                                                     class="block group"
                                                     onclick="openSplitView(event, '/article/<%= rec.article_id %>')">
@@ -300,7 +344,29 @@
                             </div>
                         </div>
 
-                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-300 dark:bg-gray-600 rounded-full opacity-80"></div>
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-pol-lean-left dark:bg-blue-600 rounded-full opacity-80"></div>
+                            <div class="flex flex-col">
+                                <div class="space-y-1">
+                                    <% if (recommendations.LeanLeft && recommendations.LeanLeft.length > 0) { %>
+                                        <% recommendations.LeanLeft.forEach(rec => { %>
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
+                                                <a href="/article/<%= rec.article_id %>" 
+                                                    class="block group"
+                                                    onclick="openSplitView(event, '/article/<%= rec.article_id %>')">
+                                                    <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                                                        <%= rec.title %>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-[11px] text-gray-400 py-2 px-1 italic">no articles available</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-pol-center dark:bg-gray-600 rounded-full opacity-80"></div>
                             <div class="flex flex-col">
                                 <div class="space-y-1">
                                     <% if (recommendations.Center && recommendations.Center.length > 0) { %>
@@ -322,7 +388,29 @@
                             </div>
                         </div>
 
-                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-300 dark:bg-red-600 rounded-full opacity-80"></div>
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-pol-lean-right dark:bg-blue-600 rounded-full opacity-80"></div>
+                            <div class="flex flex-col">
+                                <div class="space-y-1">
+                                    <% if (recommendations.LeanRight && recommendations.LeanRight.length > 0) { %>
+                                        <% recommendations.LeanRight.forEach(rec => { %>
+                                            <div class="py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
+                                                <a href="/article/<%= rec.article_id %>" 
+                                                    class="block group"
+                                                    onclick="openSplitView(event, '/article/<%= rec.article_id %>')">
+                                                    <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                                                        <%= rec.title %>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-[11px] text-gray-400 py-2 px-1 italic">no articles available</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-4 mb-8"> <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-pol-right dark:bg-red-600 rounded-full opacity-80"></div>
                             <div class="flex flex-col">
                                 <div class="space-y-1">
                                     <% if (recommendations.Right && recommendations.Right.length > 0) { %>

@@ -30,16 +30,19 @@ const initDB = async () => {
         await db.pool.query(`
             CREATE TABLE Article (
                 article_id BIGINT NOT NULL,
-                cluster_id BIGINT,
                 title VARCHAR(200) NOT NULL,
+                article_content LONGTEXT,
+                label VARCHAR(10),
+                left_percent DECIMAL(5,2),
+                lean_left_percent DECIMAL(5,2),
+                center_percent DECIMAL(5,2),
+                lean_right_percent DECIMAL(5,2),
+                right_percent DECIMAL(5,2),
+
                 summary TEXT,
                 reporter VARCHAR(50),
                 publisher VARCHAR(50),
                 created_at DATE,
-                article_content LONGTEXT,
-                label VARCHAR(10),
-                progress_percent DECIMAL(5,2),
-                conservative_percent DECIMAL(5,2),
 
                 PRIMARY KEY (article_id)
             );
