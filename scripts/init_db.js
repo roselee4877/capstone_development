@@ -84,6 +84,16 @@ const initDB = async () => {
             );
         `);
 
+        await db.pool.query(`
+            CREATE TABLE UserRecommendation (
+                user_id VARCHAR(50) PRIMARY KEY,
+                recommended_article_ids JSON,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                
+                FOREIGN KEY (user_id) REFERENCES User(user_id)
+            );
+        `);
+
 
         console.log('Database initialization completed successfully.');
     } catch (err) {
