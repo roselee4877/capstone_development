@@ -301,8 +301,12 @@
                     </div>
 
                     <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-1">
-                        <button onclick="getBiasExplanation()" id="ai-btn" 
-                            class="w-full py-0.5 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-gray-100 text-base font-semibold transition-colors flex items-center justify-center gap-1.5">
+                        <button onclick="getBiasExplanation(this)" 
+                                id="ai-btn-<%= article.id %>" 
+                                data-id="<%= article.id %>"
+                                data-label="<%= article.label %>"
+                                data-title="<%= article.title %>"
+                                class="w-full py-0.5 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-gray-100 text-base font-semibold transition-colors flex items-center justify-center gap-1.5 ai-btn">
                             <span>Why this bias?</span>
                             <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5 6L0 0.999999L10 1L5 6Z"/>
@@ -310,8 +314,8 @@
                         </button>
                     </div>
 
-                    <div id="bias-explanation" class="mt-2 text-sm text-gray-600 dark:text-gray-400 hidden leading-relaxed pt-2">
-                        </div>
+                    <div id="bias-explanation-<%= article.id %>" class="mt-2 text-sm text-gray-600 dark:text-gray-400 hidden leading-relaxed pt-2">
+                    </div>
                 </div>
 
                 <div class="bg-card-light dark:bg-card-dark px-6 pt-5 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">

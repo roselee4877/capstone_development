@@ -13,33 +13,53 @@ function executeSearch() {
     location.href = `/search?q=${encodeURIComponent(query)}`;
 }
 
-async function getBiasExplanation() {
-    const btn = document.getElementById('ai-btn');
-    const explanationDiv = document.getElementById('bias-explanation');
+async function getBiasExplanation(btn) {
+    // 1. 버튼의 dataset에서 정보 추출
+    const articleId = btn.dataset.id;
+    const label = btn.dataset.label;
+    const title = btn.dataset.title;
+
+    // 2. 해당 기사에 맞는 설명창 찾기
+    const explanationDiv = document.getElementById(`bias-explanation-${articleId}`);
     
-    // 로딩 상태 표시
+    // 3. 로딩 상태 표시
     btn.disabled = true;
-    btn.innerHTML = 'analyzing... <span class="animate-spin material-icons">sync</span>';
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="animate-spin inline-block">↻</span>analyzing...';
+    
+    // 4. 본문 텍스트 가져오기 (해당 버튼이 속한 카드의 본문만 가져오도록 선택자 주의)
+    // 버튼의 부모 요소 중 가장 가까운 기사 컨테이너를 기준으로 본문을 찾습니다.
+    const articleCard = btn.closest('.article-card'); // 기사 전체를 감싸는 클래스명으로 수정하세요
+    const articleElement = articleCard ? articleCard.querySelector('.article-body') : null;
+    const articleText = articleElement ? articleElement.innerText : "";
     
     try {
-        // 현재 기사 ID와 라벨 정보를 서버로 전송
         const response = await fetch('/api/explain-article', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                articleId: '<%= article.id %>', // 서버에서 전달받은 ID
-                label: '<%= article.label %>' 
+                articleId: articleId,
+                label: label,
+                title: title,
+                content: articleText
             })
         });
         
+        if (!response.ok) throw new Error('Network response was not ok');
+        
         const data = await response.json();
         
+        // 5. 결과 표시
         explanationDiv.classList.remove('hidden');
         explanationDiv.innerHTML = `<p class="font-semibold mb-2 text-blue-500">✨ Why this bias? :</p>${data.explanation}`;
-        btn.classList.add('hidden'); // 한 번 분석하면 버튼은 숨김
+        
+        // 버튼 숨기기
+        btn.classList.add('hidden'); 
+        
     } catch (error) {
         console.error('Error:', error);
-        btn.innerHTML = 'failed to get explanation';
+        alert('분석 중 오류가 발생했습니다.');
+        btn.innerHTML = originalHTML;
         btn.disabled = false;
     }
 }

@@ -120,10 +120,10 @@ const postArticleExplanation = async (req, res, next) => {
     const { label, title, content } = req.body;
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-preview" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
         console.log("요청 받음:", label, title);
 
-        /*
+        
         const prompt = `
             You are an expert in news media analysis.
 
@@ -142,8 +142,8 @@ const postArticleExplanation = async (req, res, next) => {
         const text = response.text();
 
         res.json({ explanation: text });
-        */
-
+        
+        /*
         const mockData = {
             explanation: `
             The term "strategic competitor" is considered a biased keyword because it reframes the U.S.-China relationship from one of diplomatic cooperation to one of direct rivalry and threat, reflecting a hawkish, right-leaning foreign policy.
@@ -151,7 +151,7 @@ const postArticleExplanation = async (req, res, next) => {
         };
         
         res.json(mockData);
-        
+        */
 
         
         
