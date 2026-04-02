@@ -275,12 +275,17 @@ const getSearchResults = async (req, res, next) => {
             let recentLogs = [];
             if (userId) {
                 [recentLogs] = await db.query(
-                    `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at 
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
-                    WHERE l.user_id = ?
-                    ORDER BY l.viewed_at DESC
-                    LIMIT 5`,
+                    `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at
+FROM Log l
+JOIN Article a ON l.article_id = a.article_id
+WHERE l.log_id IN (
+    SELECT MAX(log_id)
+    FROM Log
+    WHERE user_id = ?
+    GROUP BY article_id
+)
+ORDER BY l.viewed_at DESC
+LIMIT 5;`,
                     [userId]
                 );
             }
