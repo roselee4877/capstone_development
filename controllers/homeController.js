@@ -2,25 +2,59 @@ const db = require('../config/db');
 
 const getHomePage = async (req, res, next) => {
     try {
-            const userId = req.session.userId; // 세션에서 userId 가져오기
-            const page = parseInt(req.query.page) || 1; // 현재 페이지 (기본값 1)
-            const limit = 10; // 한 페이지에 보여줄 개수
+            const userId = req.session.userId;
+            const page = parseInt(req.query.page) || 1;
+            const limit = 10;
             const offset = (page - 1) * limit;
             const now = new Date();
-            const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); // 10분 전 시간 계산
-    
-            // 1. 해당 페이지의 기사만 가져오기
-            const [articles] = await db.query(
-                "SELECT * FROM Article ORDER BY created_at DESC LIMIT ? OFFSET ?",
-                [limit, offset]
+
+            // 1. user_recommendation에서 해당 유저의 추천 article ID 목록 가져오기
+            const [recRows] = await db.query(
+                "SELECT recommend_id FROM user_recommendation WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+                [userId]
             );
-    
-            // 2. 전체 페이지 수를 계산하기 위한 총 기사 수 구하기
-            const [[{ total }]] = await db.query("SELECT COUNT(*) as total FROM Article");
+
+            let articles = [];
+            let total = 0;
+
+            if (!recRows.length) {
+                // 추천 데이터 없을 경우 Article 테이블에서 전체 기사 가져오기
+                const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM Article");
+                total = count;
+
+                const [rows] = await db.query(
+                    "SELECT * FROM Article ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                    [limit, offset]
+                );
+                articles = rows;
+
+            } else {
+                const raw = recRows[0].recommend_id;
+                const recommendIds = typeof raw === 'string' ? JSON.parse(raw) : raw;
+
+                total = recommendIds.length;
+
+                // 2. 페이지에 해당하는 ID 슬라이싱 (순서 유지)
+                const pagedIds = recommendIds.slice(offset, offset + limit);
+
+                if (pagedIds.length) {
+                    // 3. 해당 ID들 가져오기
+                    const placeholders = pagedIds.map(() => "?").join(", ");
+                    const [rows] = await db.query(
+                        `SELECT * FROM Article WHERE article_id IN (${placeholders})`,
+                        pagedIds
+                    );
+
+                    // 4. IN절은 순서를 보장하지 않으므로, recommendIds 순서대로 정렬
+                    const articleMap = Object.fromEntries(rows.map(a => [a.article_id, a]));
+                    articles = pagedIds.map(id => articleMap[id]).filter(Boolean);
+                }
+            }
+
             const totalPages = Math.ceil(total / limit);
-            const maxDisplayPages = 10;
+            const maxDisplayPages = 5;
             let startPage = Math.max(1, page - Math.floor(maxDisplayPages / 2));
-            let endPage = startPage + maxDisplayPages - 1; 
+            let endPage = startPage + maxDisplayPages - 1;
             if (endPage > totalPages) {
                 endPage = totalPages;
                 startPage = Math.max(1, endPage - maxDisplayPages + 1);
@@ -276,16 +310,16 @@ const getSearchResults = async (req, res, next) => {
             if (userId) {
                 [recentLogs] = await db.query(
                     `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at
-FROM Log l
-JOIN Article a ON l.article_id = a.article_id
-WHERE l.log_id IN (
-    SELECT MAX(log_id)
-    FROM Log
-    WHERE user_id = ?
-    GROUP BY article_id
-)
-ORDER BY l.viewed_at DESC
-LIMIT 5;`,
+                    FROM Log l
+                    JOIN Article a ON l.article_id = a.article_id
+                    WHERE l.log_id IN (
+                        SELECT MAX(log_id)
+                        FROM Log
+                        WHERE user_id = ?
+                        GROUP BY article_id
+                    )
+                    ORDER BY l.viewed_at DESC
+                    LIMIT 5;`,
                     [userId]
                 );
             }
