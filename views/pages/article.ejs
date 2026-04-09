@@ -97,6 +97,7 @@
                         <% 
                             const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
                             let highlightedContent = article.article_content || '';
+                            //let highlightedContent = (article.article_content || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
 
 
                             let colorClass = "";
@@ -255,7 +256,7 @@
             <% if (!isSplitView) { %>
             <aside class="space-y-8">
                 <div class="bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-4">Political Bias</h3>
+                    <h3 class="text-lg font-semibold mb-4">Predicted Political Bias</h3>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
                         
                         <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
@@ -321,7 +322,7 @@
                 <div class="bg-card-light dark:bg-card-dark px-6 pt-5 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-text-light dark:text-text-dark flex items-center gap-2">
-                            Comparing Perspectives
+                            Explore Related Articles
                         </h3>
                     </div>
 

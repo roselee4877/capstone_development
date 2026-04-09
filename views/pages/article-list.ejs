@@ -44,6 +44,28 @@
             font-family: 'Noto Sans KR', sans-serif;
         }
 </style>
+
+<header style="
+    display: flex; 
+    justify-content: center; 
+    padding-top: 2.5rem;    /* 위쪽 여백은 원래의 넉넉한 느낌 유지 */
+    padding-bottom: 0.5rem; /* 아래쪽 여백은 대폭 줄임 */
+    background: none;
+    text-shadow: 2px 2px 4px rgba(79, 70, 229, 0.1);
+">
+    <h1 style="
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        font-size: 3rem; 
+        font-weight: 900; 
+        color: #4f46e5;      /* 인디고 색상 */
+        margin: 0;
+        line-height: 1; 
+        letter-spacing: -0.06em;
+        text-transform: uppercase;
+    ">
+        The News Hub
+    </h1>
+</header>
 </head>
     <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
         <div class="container mx-auto px-6 lg:px-20 py-8 max-w-7xl">
@@ -124,7 +146,7 @@
 
     <aside class="space-y-8">
         <div class="bg-card-light dark:bg-card-dark px-6 pt-3 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
-            <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">My Weekly Political Lean</h3>
+            <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">My Weekly Bias Stats</h3>
             
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
                 
@@ -172,12 +194,12 @@
 
             <% if (stats.weekly.Left === 0 && stats.weekly.LeanLeft === 0 && 
             stats.weekly.Center === 0 && stats.weekly.LeanRight === 0 && stats.weekly.Right === 0) { %>
-                <p class="text-[10px] text-center mt-2 text-subtext-light">기록된 활동 데이터가 없습니다.</p>
+                <p class="text-[10px] text-center mt-2 text-subtext-light">no recent activity</p>
             <% } %>
         
             <div class="border-t border-gray-100 dark:border-gray-700 mb-6"></div>
 
-            <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">My Overall Political Lean</h3>
+            <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">My Overall Bias Stats</h3>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
                 
                 <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
@@ -224,53 +246,64 @@
 
             <% if (stats.total.Left === 0 && stats.total.LeanLeft === 0 && 
             stats.total.Center === 0 && stats.total.LeanRight === 0 && stats.total.Right === 0) { %>
-                <p class="text-[10px] text-center mt-2 text-subtext-light">기록된 활동 데이터가 없습니다.</p>
+                <p class="text-[10px] text-center mt-2 text-subtext-light">no recent activity</p>
             <% } %>
         </div>
 
         <div class="bg-card-light dark:bg-card-dark px-6 pt-3 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold mb-2 text-text-light dark:text-text-dark">Recent History</h3>
+            <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">Political Bias in My Feed</h3>
+            
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
+                
+                <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.recommend.Left %>%">
+                    <% if (stats.recommend.Left > 5) { %> 
+                        <span>Left</span>
+                        <span><%= stats.recommend.Left %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.recommend.LeanLeft %>%">
+                    <% if (stats.recommend.LeanLeft > 5) { %> 
+                        <span>Lean Left</span>
+                        <span><%= stats.recommend.LeanLeft %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500" 
+                    style="width: <%= stats.recommend.Center %>%">
+                    <% if (stats.recommend.Center > 5) { %>
+                        <span>Center</span>
+                        <span><%= stats.recommend.Center %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500" 
+                    style="width: <%= stats.recommend.LeanRight %>%">
+                    <% if (stats.recommend.LeanRight > 5) { %>
+                        <span>Lean Right</span>
+                        <span><%= stats.recommend.LeanRight %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500" 
+                    style="width: <%= stats.recommend.Right %>%">
+                    <% if (stats.recommend.Right > 5) { %>
+                        <span>Right</span>
+                        <span><%= stats.recommend.Right %>%</span>
+                    <% } %>
+                </div>
+
             </div>
 
-            <div class="space-y-0">
-                <% if (recentLogs && recentLogs.length > 0) { %>
-                    <% recentLogs.forEach(log => { %>
-                        <div class="py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors rounded-md px-1">
-                            <a href="/article/<%= log.article_id %>" class="block group">
-                                <div class="flex items-center gap-3"> 
-                                    
-                                    <div class="shrink-0">
-                                        <% if (log.label == "Left") { %>
-                                            <span class="block w-3 h-3 bg-pol-left dark:bg-red-400 rounded-full shadow-sm"></span>
-                                        <% } else if (log.label == "Lean Left") { %>
-                                            <span class="block w-3 h-3 bg-pol-lean-left dark:bg-blue-400 rounded-full shadow-sm"></span>
-                                        <% } else if (log.label == "Lean Right") { %>
-                                            <span class="block w-3 h-3 bg-pol-lean-right dark:bg-blue-400 rounded-full shadow-sm"></span>
-                                        <% } else if (log.label == "Right") { %>
-                                            <span class="block w-3 h-3 bg-pol-right dark:bg-red-400 rounded-full shadow-sm"></span>
-                                        <% } else { %>
-                                            <span class="block w-3 h-3 bg-pol-center dark:bg-gray-500 rounded-full shadow-sm"></span>
-                                        <% } %>
-                                    </div>
-
-                                    <div class="flex-grow min-w-0"> <p class="text-sm font-medium text-text-light dark:text-text-dark line-clamp-2 group-hover:text-primary transition-colors mb-0.5 leading-tight">
-                                            <%= log.title %>
-                                        </p>
-                                        <div class="flex items-center text-[10px] text-subtext-light dark:text-subtext-dark opacity-80">
-                                            <span><%= log.publisher %></span>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </a>
-                        </div>
-                    <% }); %>
-                <% } else { %>
-                    <p class="text-center py-6 text-xs text-subtext-light">No recent activity</p>
-                <% } %>
-            </div>
+            <% if (stats.recommend.Left === 0 && stats.recommend.LeanLeft === 0 && 
+            stats.recommend.Center === 0 && stats.recommend.LeanRight === 0 && stats.recommend.Right === 0) { %>
+                <p class="text-[10px] text-center mt-2 text-subtext-light">no data</p>
+            <% } %>
         </div>
+
+        
     </aside>
 </main>
 

@@ -63,7 +63,8 @@ const getHomePage = async (req, res, next) => {
             // 2. 사용자 성향 통계 가져오기 (예시: 세션의 user_id 사용)
             let stats = {
                 weekly: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
-                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
+                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
+                recommend: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
             };
             if (userId) {
                 const [weekly_rows] = await db.query(`
@@ -86,14 +87,27 @@ const getHomePage = async (req, res, next) => {
                     GROUP BY a.label
                 `, [userId]);
 
+                let recommend_rows = [];
+                if (articles.length) {
+                    [recommend_rows] = await db.query(`
+                        SELECT 
+                            a.label,
+                            COUNT(*) as recommend_count
+                        FROM Article a
+                        WHERE a.article_id IN (${articles.map(() => "?").join(", ")})
+                        GROUP BY a.label
+                    `, articles.map(a => a.article_id));
+                }
+
                 let tSum = 0; // 전체 합계
                 let wSum = 0; // 주간 합계
+                let rSum = 0; // 추천 합계
                 const counts = {
-                    Left: { t: 0, w: 0 },
-                    LeanLeft: { t: 0, w: 0 },
-                    Center: { t: 0, w: 0 },
-                    LeanRight: { t: 0, w: 0 },
-                    Right: { t: 0, w: 0 }
+                    Left: { t: 0, w: 0, r: 0 },
+                    LeanLeft: { t: 0, w: 0, r: 0 },
+                    Center: { t: 0, w: 0, r: 0 },
+                    LeanRight: { t: 0, w: 0, r: 0 },
+                    Right: { t: 0, w: 0, r: 0 }
                 };
 
                 weekly_rows.forEach(row => {
@@ -114,7 +128,16 @@ const getHomePage = async (req, res, next) => {
                     tSum += row.total_count;
                 });
 
-                console.log(counts.Left, counts.LeanLeft, counts.Center, counts.LeanRight, counts.Right);
+                recommend_rows.forEach(row => {
+                    if (row.label === 'Left') counts.Left.r = row.recommend_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.r = row.recommend_count;
+                    else if (row.label === 'Center') counts.Center.r = row.recommend_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.r = row.recommend_count;
+                    else if (row.label === 'Right') counts.Right.r = row.recommend_count;
+                    rSum += row.recommend_count;
+                });
+
+
 
                 // 퍼센트 계산 함수
                 const getPct = (count, total) => total > 0 ? Math.round((count / total) * 100) : 0;
@@ -133,6 +156,13 @@ const getHomePage = async (req, res, next) => {
                         Center: getPct(counts.Center.t, tSum),
                         LeanRight: getPct(counts.LeanRight.t, tSum),
                         Right: getPct(counts.Right.t, tSum)
+                    },
+                    recommend: {
+                        Left: getPct(counts.Left.r, rSum),
+                        LeanLeft: getPct(counts.LeanLeft.r, rSum),
+                        Center: getPct(counts.Center.r, rSum),
+                        LeanRight: getPct(counts.LeanRight.r, rSum),
+                        Right: getPct(counts.Right.r, rSum)
                     }
                 };
 
@@ -210,6 +240,14 @@ const getSearchResults = async (req, res, next) => {
         const total = countRows[0].count;
         const totalPages = Math.ceil(total / limit);
 
+        const [Search_rows] = await db.query(
+            `SELECT label, COUNT(*) as search_count 
+            FROM Article 
+            WHERE ${conditions}
+            GROUP BY label`, 
+            params
+        );
+
         // 4. 해당 페이지의 데이터만 가져오기 (LIMIT, OFFSET 적용)
         // 주의: params 배열 뒤에 limit와 offset을 추가로 붙여야 합니다.
         const sql = `SELECT * FROM Article WHERE ${conditions} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
@@ -228,7 +266,8 @@ const getSearchResults = async (req, res, next) => {
         // 2. 사용자 성향 통계 가져오기 (예시: 세션의 user_id 사용)
             let stats = {
                 weekly: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
-                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
+                total: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 },
+                recommend: { Left: 0, LeanLeft: 0, Center: 0, LeanRight: 0, Right: 0 }
             };
             if (userId) {
                 const [weekly_rows] = await db.query(`
@@ -253,12 +292,13 @@ const getSearchResults = async (req, res, next) => {
 
                 let tSum = 0; // 전체 합계
                 let wSum = 0; // 주간 합계
+                let sSum = 0; // 검색 합계
                 const counts = {
-                    Left: { t: 0, w: 0 },
-                    LeanLeft: { t: 0, w: 0 },
-                    Center: { t: 0, w: 0 },
-                    LeanRight: { t: 0, w: 0 },
-                    Right: { t: 0, w: 0 }
+                    Left: { t: 0, w: 0, s: 0 },
+                    LeanLeft: { t: 0, w: 0, s: 0 },
+                    Center: { t: 0, w: 0, s: 0 },
+                    LeanRight: { t: 0, w: 0, s: 0 },
+                    Right: { t: 0, w: 0, s: 0 }
                 };
 
                 weekly_rows.forEach(row => {
@@ -278,6 +318,16 @@ const getSearchResults = async (req, res, next) => {
                     else if (row.label === 'Right') counts.Right.t = row.total_count;
                     tSum += row.total_count;
                 });
+
+                Search_rows.forEach(row => {
+                    if (row.label === 'Left') counts.Left.s = row.search_count;
+                    else if (row.label === 'Lean Left') counts.LeanLeft.s = row.search_count;
+                    else if (row.label === 'Center') counts.Center.s = row.search_count;
+                    else if (row.label === 'Lean Right') counts.LeanRight.s = row.search_count;
+                    else if (row.label === 'Right') counts.Right.s = row.search_count;
+                    sSum += row.search_count;
+                });
+
 
                 console.log(counts.Left, counts.LeanLeft, counts.Center, counts.LeanRight, counts.Right);
 
