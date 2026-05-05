@@ -140,8 +140,27 @@
                                             
                                             // 해당 문장 안에 포함된 모든 키워드에 대해 순차적으로 replace 수행
                                             keywords.forEach(word => {
-                                                const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                                                const wordRegex = new RegExp(`(${escapedWord})`, 'gi');
+                                                // 키워드를 공백 기준으로 단어들로 분리
+                                                const tokens = word.split(/\s+/).filter(t => t.length > 0);
+                                                
+                                                let wordRegex;
+                                                if (tokens.length <= 1) {
+                                                    // 단일 단어: 기존 방식 그대로
+                                                    const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                                    wordRegex = new RegExp(`(${escapedWord})`, 'gi');
+                                                } else {
+                                                    // 여러 단어: 단어 사이에 다른 단어가 끼어들 수 있도록 처리
+                                                    // 각 토큰을 이스케이프하고, 사이에 "최대 30자 이내의 임의 문자" 허용
+                                                    // (HTML 태그가 끼면 안 되므로 < > 는 제외)
+                                                    const escapedTokens = tokens.map(t => 
+                                                        t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                                                    );
+                                                    // 단어 경계(\b)로 감싸고, 사이에는 < > 가 없는 임의 문자 0~30자 허용
+                                                    const pattern = escapedTokens
+                                                        .map(t => `(${t})`)
+                                                        .join('([^<>]{0,30}?)');
+                                                    wordRegex = new RegExp(pattern, 'gi');
+                                                }
                                                 const safeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 
                                                 /*updatedMatch = updatedMatch.replace(wordRegex, (w) => {
@@ -152,13 +171,17 @@
                                                             onclick="explainKeyword('${safeWord}', '${label}')">${w}</span>`;
                                                 });*/
 
-                                                updatedMatch = updatedMatch.replace(wordRegex, (w) => {
-                                                    if (w.includes('keyword-highlight')) return w;
+                                                updatedMatch = updatedMatch.replace(wordRegex, (...args) => {
+                                                    // args: [전체매칭, 캡처1, 캡처2, ..., offset, fullString]
+                                                    // 다중 단어인 경우: 캡처 그룹들이 [단어1, 갭1, 단어2, 갭2, 단어3, ...] 형태로 들어옴
+                                                    // 단일 단어인 경우: 캡처 그룹이 [단어] 하나만 있음
+                                                    const fullMatch = args[0];
                                                     
-                                                    const uniqueId = `expander-${Math.random().toString(36).substr(2, 9)}`;
+                                                    // 이미 하이라이트된 영역이라면 건너뛰기
+                                                    if (fullMatch.includes('keyword-highlight')) return fullMatch;
+                                                    
                                                     const currentSafeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                                                     
-                                                    //여기는 대체 뭐때매 있는거지????????????
                                                     let descriptionColorClass = "";
                                                     if (label == 'Left') {
                                                         descriptionColorClass = "bg-blue-100 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900";
@@ -172,16 +195,19 @@
                                                         descriptionColorClass = "bg-gray-100 dark:bg-gray-800/40 border-gray-100 dark:border-gray-700";
                                                     }
                                                     
-                                                    return `
+                                                    // 공통 expander/highlight HTML을 생성하는 헬퍼
+                                                    const buildHighlight = (displayText) => {
+                                                        const uniqueId = `expander-${Math.random().toString(36).substr(2, 9)}`;
+                                                        return `
                                                         <span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight hover:text-primary transition-colors inline" 
                                                             onclick="toggleExpander('${uniqueId}', '${currentSafeWord}')">
-                                                            ${w}
+                                                            ${displayText}
                                                         </span>
                                                         <div id="${uniqueId}" class="expander-content hidden w-full overflow-hidden transition-all duration-300 ease-in-out">
                                                             <div class="mb-1 pt-2 pb-2 px-5 rounded-xl shadow-sm border ${descriptionColorClass}">
                                                                 <div class="flex justify-between items-center mb-1">
                                                                     <h4 class="text-base font-bold text-text-light dark:text-text-dark leading-none">
-                                                                        ${w}
+                                                                        ${displayText}
                                                                     </h4>
                                                                     <button onclick="event.stopPropagation(); closeExpander('${uniqueId}')" class="text-gray-400 hover:text-gray-600 p-1">
                                                                         <span class="material-icons text-sm text-gray-400 hover:text-gray-600 cursor-pointer">close</span>
@@ -195,6 +221,28 @@
                                                                 </p>
                                                             </div>
                                                         </div>`;
+                                                    };
+                                                    
+                                                    if (tokens.length <= 1) {
+                                                        // 단일 단어: 매칭된 텍스트를 통째로 하이라이트
+                                                        return buildHighlight(fullMatch);
+                                                    } else {
+                                                        // 다중 단어: 캡처 그룹을 순회하며 홀수번째(단어)는 하이라이트, 짝수번째(갭)는 그대로
+                                                        // 캡처 그룹 개수: tokens.length개의 단어 + (tokens.length - 1)개의 갭
+                                                        const captureCount = tokens.length * 2 - 1;
+                                                        let result = '';
+                                                        for (let i = 0; i < captureCount; i++) {
+                                                            const captured = args[i + 1] || '';
+                                                            if (i % 2 === 0) {
+                                                                // 단어 부분 → 하이라이트
+                                                                result += buildHighlight(captured);
+                                                            } else {
+                                                                // 갭 부분 → 그대로 두기
+                                                                result += captured;
+                                                            }
+                                                        }
+                                                        return result;
+                                                    }
                                                 });
                                                 
                                             });

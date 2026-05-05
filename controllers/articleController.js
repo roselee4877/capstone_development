@@ -57,13 +57,7 @@ const getArticleDetail = async (req, res, next) => {
                     LeanRight: recommendationRows.filter(r => r.label == "Lean Right"),
                     Right: recommendationRows.filter(r => r.label == "Right")
                 };
-
-                console.log("---------- 추천 데이터 집계 결과 ----------");
-                Object.entries(recommendations).forEach(([label, list]) => {
-                    console.log(`${label.padEnd(12)} : ${list.length}개 발견`);
-                });
-                console.log("-----------------------------------------");
-
+                console.log(keywordsData);
     
                 // 상세 페이지(article.ejs) 렌더링
                 res.render('pages/article', { 

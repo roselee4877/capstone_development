@@ -3,7 +3,8 @@ const path = require('path');
 const db = require('../config/db');
 
 // JSON 파일이 위치한 경로
-const JSON_DIR = 'C:/Users/rosel/OneDrive/바탕 화면/졸프_dataset/allsides_l_test_ig_results/ig';
+const JSON_DIR = 'C:/code/capstone_development/scripts/IG_khan';
+//C:\code\capstone_development\scripts\IG_khan
 // "C:\Users\rosel\OneDrive\바탕 화면\졸프_dataset\allsides_l_test_ig_results\ig"
 
 async function migrateData() {
