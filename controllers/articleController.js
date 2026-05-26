@@ -20,7 +20,7 @@ const getArticleDetail = async (req, res, next) => {
     
                 // 해당 기사의 키워드들 가져오기
                 const [keywordRows] = await db.pool.query(
-                    'SELECT keyword, sentence FROM Keyword WHERE article_id = ?', 
+                    'SELECT keyword, sentence FROM keyword WHERE article_id = ?', 
                     [articleId]
                 );
 

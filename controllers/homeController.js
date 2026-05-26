@@ -234,7 +234,7 @@ const getSearchResults = async (req, res, next) => {
     try {
         // 3. 검색 결과 총 개수(Total) 가져오기 (페이지네이션 계산용)
         const [countRows] = await db.query(
-            `SELECT COUNT(*) as count FROM Article WHERE ${conditions}`, 
+            `SELECT COUNT(*) as count FROM article WHERE ${conditions}`, 
             params
         );
         const total = countRows[0].count;
@@ -242,7 +242,7 @@ const getSearchResults = async (req, res, next) => {
 
         const [Search_rows] = await db.query(
             `SELECT label, COUNT(*) as search_count 
-            FROM Article 
+            FROM article 
             WHERE ${conditions}
             GROUP BY label`, 
             params
@@ -250,7 +250,7 @@ const getSearchResults = async (req, res, next) => {
 
         // 4. 해당 페이지의 데이터만 가져오기 (LIMIT, OFFSET 적용)
         // 주의: params 배열 뒤에 limit와 offset을 추가로 붙여야 합니다.
-        const sql = `SELECT * FROM Article WHERE ${conditions} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+        const sql = `SELECT * FROM article WHERE ${conditions} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
         const [rows] = await db.query(sql, [...params, limit, offset]);
 
         // 5. 표시할 페이지 번호 범위 계산 (최대 10개씩)
