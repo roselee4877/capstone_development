@@ -10,4 +10,5 @@ Thumbs.db
 .env
 
 # 로그 파일
-*.log
+*.logdump.sql
+dump.sql

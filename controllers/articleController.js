@@ -13,7 +13,7 @@ const getArticleDetail = async (req, res, next) => {
             const isSplit = req.query.isSplit; // URL의 ?isSplit=true를 읽어옴
     
             // DB에서 해당 ID의 기사 한 개만 가져오기
-            const [rows] = await db.pool.query('SELECT * FROM Article WHERE article_id = ?', [articleId]);
+            const [rows] = await db.pool.query('SELECT * FROM article WHERE article_id = ?', [articleId]);
     
             if (rows.length > 0) {
                 const article = rows[0];
@@ -43,8 +43,8 @@ const getArticleDetail = async (req, res, next) => {
                 // 주제가 비슷하면서 다른 관점(label)을 가진 기사들을 가져옵니다.
                 const [recommendationRows] = await db.pool.query(`
                     SELECT A.article_id, A.title, R.label 
-                    FROM Recommendation R
-                    JOIN Article A ON R.recommend_id = A.article_id
+                    FROM recommendation R
+                    JOIN article A ON R.recommend_id = A.article_id
                     WHERE R.article_id = ?
                 `, [articleId]);
     

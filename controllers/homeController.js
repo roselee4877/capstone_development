@@ -19,11 +19,11 @@ const getHomePage = async (req, res, next) => {
 
             if (!recRows.length) {
                 // 추천 데이터 없을 경우 Article 테이블에서 전체 기사 가져오기
-                const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM Article");
+                const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM article");
                 total = count;
 
                 const [rows] = await db.query(
-                    "SELECT * FROM Article ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                    "SELECT * FROM article ORDER BY created_at DESC LIMIT ? OFFSET ?",
                     [limit, offset]
                 );
                 articles = rows;
@@ -41,7 +41,7 @@ const getHomePage = async (req, res, next) => {
                     // 3. 해당 ID들 가져오기
                     const placeholders = pagedIds.map(() => "?").join(", ");
                     const [rows] = await db.query(
-                        `SELECT * FROM Article WHERE article_id IN (${placeholders})`,
+                        `SELECT * FROM article WHERE article_id IN (${placeholders})`,
                         pagedIds
                     );
 
@@ -71,8 +71,8 @@ const getHomePage = async (req, res, next) => {
                     SELECT 
                         a.label,
                         COUNT(CASE WHEN l.viewed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as weekly_count
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.user_id = ?
                     GROUP BY a.label
                 `, [userId]);
@@ -81,8 +81,8 @@ const getHomePage = async (req, res, next) => {
                     SELECT 
                         a.label,
                         COUNT(*) as total_count
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.user_id = ?
                     GROUP BY a.label
                 `, [userId]);
@@ -93,7 +93,7 @@ const getHomePage = async (req, res, next) => {
                         SELECT 
                             a.label,
                             COUNT(*) as recommend_count
-                        FROM Article a
+                        FROM article a
                         WHERE a.article_id IN (${articles.map(() => "?").join(", ")})
                         GROUP BY a.label
                     `, articles.map(a => a.article_id));
@@ -175,8 +175,8 @@ const getHomePage = async (req, res, next) => {
             if (userId) {
                 [recentLogs] = await db.query(
                     `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at 
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.user_id = ?
                     ORDER BY l.viewed_at DESC
                     LIMIT 5`,
@@ -274,8 +274,8 @@ const getSearchResults = async (req, res, next) => {
                     SELECT 
                         a.label,
                         COUNT(CASE WHEN l.viewed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as weekly_count
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.user_id = ?
                     GROUP BY a.label
                 `, [userId]);
@@ -284,8 +284,8 @@ const getSearchResults = async (req, res, next) => {
                     SELECT 
                         a.label,
                         COUNT(*) as total_count
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.user_id = ?
                     GROUP BY a.label
                 `, [userId]);
@@ -360,11 +360,11 @@ const getSearchResults = async (req, res, next) => {
             if (userId) {
                 [recentLogs] = await db.query(
                     `SELECT a.article_id, a.title, a.publisher, a.label, l.viewed_at
-                    FROM Log l
-                    JOIN Article a ON l.article_id = a.article_id
+                    FROM log l
+                    JOIN article a ON l.article_id = a.article_id
                     WHERE l.log_id IN (
                         SELECT MAX(log_id)
-                        FROM Log
+                        FROM log
                         WHERE user_id = ?
                         GROUP BY article_id
                     )
@@ -413,7 +413,7 @@ const getUserLogs = async (req, res, next) => {
     try {
         // 3. DB Insert (viewed_at은 DB 기본값 사용 가능하지만 전달받은 값 우선 사용)
         await db.query(
-            'INSERT INTO Log (user_id, article_id, viewed_at) VALUES (?, ?, NOW())',
+            'INSERT INTO log (user_id, article_id, viewed_at) VALUES (?, ?, NOW())',
             [userId, article_id] // timestamp는 전달하지 않음
         );
         

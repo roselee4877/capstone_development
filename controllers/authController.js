@@ -26,7 +26,7 @@ const postLogin = async (req, res, next) => {
         }
 
         const [rows] = await db.pool.execute(
-            'SELECT user_id FROM `User` WHERE user_id = ? AND password = ? LIMIT 1',
+            'SELECT user_id FROM `user` WHERE user_id = ? AND password = ? LIMIT 1',
             [username, password]
         );
 
@@ -58,7 +58,7 @@ const postRegister = async (req, res, next) => {
         }
 
         await db.query(
-            `INSERT INTO User (user_id, password, user_politic)
+            `INSERT INTO user (user_id, password, user_politic)
             VALUES (?, ?, ?)`, 
             [username, password, political]
         ); 
