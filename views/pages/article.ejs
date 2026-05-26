@@ -43,6 +43,15 @@
             },
         };
     </script>
+    <style>
+        :root {
+            --hl-left:       #93c5fd;  /* blue-300 */
+            --hl-lean-left:  #bfdbfe;  /* blue-200 */
+            --hl-center:     #e5e7eb;  /* gray-200 */
+            --hl-lean-right: #fecaca;  /* red-200 */
+            --hl-right:      #fca5a5;  /* red-300 */
+        }
+    </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
     <div class="container mx-auto px-4 md:px-12 lg:px-20 py-8 max-w-7xl">
@@ -87,13 +96,13 @@
                             const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
                             let highlightedContent = article.article_content || '';
 
-                            let colorClass = "";
-                            const label = article.label; 
-                            if (label === 'Left') colorClass = "pol-highlight-left";
-                            else if (label === 'Right') colorClass = "pol-highlight-right";
-                            else if (label === 'Lean Left') colorClass = "pol-highlight-lean-left";
-                            else if (label === 'Lean Right') colorClass = "pol-highlight-lean-right";
-                            else colorClass = "pol-highlight-center";
+                            const label = article.label;
+                            let colorClass = ""; 
+                            if (label === 'Left') colorClass = "--hl-left";
+                            else if (label === 'Right') colorClass = "--hl-right";
+                            else if (label === 'Lean Left') colorClass = "--hl-lean-left";
+                            else if (label === 'Lean Right') colorClass = "--hl-lean-right";
+                            else colorClass = "--hl-center";
 
                             if (highlightedContent && currentKeywords.length > 0) {
                                 //group keywords by their associated sentences
@@ -175,15 +184,16 @@
                                                     const buildHighlight = (displayText) => {
                                                         const uniqueId = `expander-${Math.random().toString(36).substr(2, 9)}`;
                                                         return `
-                                                        <span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight hover:text-primary transition-colors inline" 
-                                                            onclick="toggleExpander('${uniqueId}', '${currentSafeWord}')">
+                                                        <span class="font-medium cursor-pointer keyword-highlight hover:text-primary transition-colors inline" 
+                                                            style="background-color: var(${colorClass});"
+                                                            onclick="toggleExpander('${uniqueId}', '${currentSafeWord}', '${label}')">
                                                             ${displayText}
                                                         </span>
                                                         <div id="${uniqueId}" class="expander-content hidden w-full overflow-hidden transition-all duration-300 ease-in-out">
                                                             <div class="mb-1 pt-2 pb-2 px-5 rounded-xl shadow-sm border ${descriptionColorClass}">
                                                                 <div class="flex justify-between items-center mb-1">
                                                                     <h4 class="text-base font-bold text-text-light dark:text-text-dark leading-none">
-                                                                        ${displayText}
+                                                                        ${currentSafeWord}
                                                                     </h4>
                                                                     <button onclick="event.stopPropagation(); closeExpander('${uniqueId}')" class="text-gray-400 hover:text-gray-600 p-1">
                                                                         <span class="material-icons text-sm text-gray-400 hover:text-gray-600 cursor-pointer">close</span>

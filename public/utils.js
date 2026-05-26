@@ -64,10 +64,9 @@ async function getBiasExplanation(btn) {
     }
 }
 
-async function toggleExpander(id, keyword) {
+async function toggleExpander(id, keyword, label) {
     const container = document.getElementById(id);
     const textElement = container.querySelector('.description-text');
-    const label = "<%= article.label %>"; // EJS 변수 활용
     
     // 1. 이미 열려있다면 -> 닫기
     if (!container.classList.contains('hidden')) {
