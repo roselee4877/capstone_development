@@ -57,7 +57,6 @@ const getArticleDetail = async (req, res, next) => {
                     LeanRight: recommendationRows.filter(r => r.label == "Lean Right"),
                     Right: recommendationRows.filter(r => r.label == "Right")
                 };
-                console.log(keywordsData);
     
                 // 상세 페이지(article.ejs) 렌더링
                 res.render('pages/article', { 

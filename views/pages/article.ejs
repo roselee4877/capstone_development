@@ -31,6 +31,12 @@
                         "pol-center": colors.gray[300],
                         "pol-lean-right": colors.red[200],
                         "pol-right": colors.red[400],
+
+                        "pol-highlight-left": colors.blue[300],
+                        "pol-highlight-lean-left": colors.blue[200],
+                        "pol-highlight-center": colors.gray[200],
+                        "pol-highlight-lean-right": colors.red[200],
+                        "pol-highlight-right": colors.red[300],
                     },
                     fontFamily: { display: ["Noto Sans KR", "sans-serif"] },
                 },
@@ -70,63 +76,41 @@
         </header>
         <% } %>
 
-         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <main id="view-container" class="lg:col-span-2 flex gap-4 transition-all duration-500">
                 <article id="left-view" class="w-full bg-card-light dark:bg-card-dark p-6 rounded-lg shadow-md transition-all duration-500">
                     <div class="prose dark:prose-invert max-w-none">
-                        <% if (article.publisher) { %>
-                            <span class="inline-block bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark text-sm font-medium px-3 py-1 rounded-full mb-4">
-                                <%= article.publisher %>
-                            </span>
-                        <% } %>
-
-                        <h1 class="text-3xl font-bold mb-4"><%= article.title %></h1>
-
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
-                            <% if (article.reporter) { %>
-                                <span><%= article.reporter %></span>
-                            <% } %>
-                            
-                            <% if (article.reporter && article.created_at) { %>
-                                <span class="hidden sm:inline">|</span>
-                            <% } %>
-
-                        </div>
+                        <h1 class="text-3xl font-bold mb-8"><%= article.title %></h1>
                         
                         <div class="text-lg leading-relaxed space-y-4">
                         <% 
                             const currentKeywords = (typeof keywords !== 'undefined' && keywords) ? keywords : [];
                             let highlightedContent = article.article_content || '';
-                            //let highlightedContent = (article.article_content || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
-
 
                             let colorClass = "";
                             const label = article.label; 
-                            if (label === 'Left') colorClass = "bg-blue-300 dark:bg-blue-900/50";
-                            else if (label === 'Right') colorClass = "bg-red-300 dark:bg-red-900/50";
-                            else if (label === 'Lean Left') colorClass = "bg-blue-200 dark:bg-blue-900/50";
-                            else if (label === 'Lean Right') colorClass = "bg-red-200 dark:bg-red-900/50";
-                            else colorClass = "bg-gray-200 dark:bg-gray-700/50";
+                            if (label === 'Left') colorClass = "pol-highlight-left";
+                            else if (label === 'Right') colorClass = "pol-highlight-right";
+                            else if (label === 'Lean Left') colorClass = "pol-highlight-lean-left";
+                            else if (label === 'Lean Right') colorClass = "pol-highlight-lean-right";
+                            else colorClass = "pol-highlight-center";
 
                             if (highlightedContent && currentKeywords.length > 0) {
-                                // 1. 문장별로 키워드 그룹화
+                                //group keywords by their associated sentences
                                 const sentenceMap = new Map();
                                 currentKeywords.forEach(item => {
                                     const s = (item.sentence || "").trim();
                                     if (!s) return;
                                     if (!sentenceMap.has(s)) sentenceMap.set(s, []);
                                     sentenceMap.get(s).push((item.keyword || "").trim());
-
-                                    //console.log(item.keyword, "\n", s, "\n\n");
                                 });
 
-                                // 2. 문장 길이가 긴 순서대로 처리 (중복 방지)
+                                // 2. 문장 길이가 긴 순서대로 처리 (중복 방지) 
                                 const sortedSentences = Array.from(sentenceMap.keys()).sort((a, b) => b.length - a.length);
 
                                 sortedSentences.forEach(fullSentence => {
                                     const keywords = sentenceMap.get(fullSentence);
                                     
-                                    // 정규식 유연화 (기존 로직 유지)
                                     const flexibleSentence = fullSentence
                                         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
                                         .replace(/[^a-zA-Z0-9\s]/g, '.?')
@@ -162,14 +146,6 @@
                                                     wordRegex = new RegExp(pattern, 'gi');
                                                 }
                                                 const safeWord = word.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-
-                                                /*updatedMatch = updatedMatch.replace(wordRegex, (w) => {
-                                                    // 이미 하이라이트된 단어라면 건너뛰기 (중복 방지)
-                                                    if (w.includes('keyword-highlight')) return w;
-                                                    
-                                                    return `<span class="${colorClass} border-b-2 font-medium cursor-pointer keyword-highlight" 
-                                                            onclick="explainKeyword('${safeWord}', '${label}')">${w}</span>`;
-                                                });*/
 
                                                 updatedMatch = updatedMatch.replace(wordRegex, (...args) => {
                                                     // args: [전체매칭, 캡처1, 캡처2, ..., offset, fullString]
@@ -249,7 +225,7 @@
                                             return updatedMatch;
                                         });
                                     } catch (e) {
-                                        console.error("정규식 오류:", fullSentence);
+                                        console.error("error:", fullSentence);
                                     }
                                 });
                             }
