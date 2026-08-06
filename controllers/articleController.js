@@ -80,10 +80,23 @@ const postKeywordExplanation = async (req, res, next) => {
     const { keyword, label, title, content } = req.body;
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
         console.log("요청 받음:", keyword, label);
 
-        
+        // 하드코딩된 설명 매핑
+        const hardcodedExplanations = {
+            "lockdowns": "This keyword was identified as right-leaning because it attributes the crisis to government restrictions rather than to the virus itself, a framing commonly emphasized by conservative media.",
+            "surging in December": "This keyword was identified as left-leaning because it frames the pandemic as a virus-driven crisis rather than the result of policy failures, downplaying the role of government response.",
+            "collecting handouts": "This keyword was identified as right-leaning because it frames welfare policies as a financial burden rather than a social safety net, downplaying the role of government support."
+        };
+
+        // 키워드가 하드코딩 목록에 있으면 3초 대기 후 반환
+        if (hardcodedExplanations[keyword]) {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            return res.json({ explanation: hardcodedExplanations[keyword] });
+        }
+
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
         const prompt = `
             You are an expert in news media analysis.
 
@@ -116,7 +129,7 @@ const postArticleExplanation = async (req, res, next) => {
         const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
         console.log("요청 받음:", label, title);
 
-        
+        /*
         const prompt = `
             You are an expert in news media analysis.
 
@@ -129,22 +142,36 @@ const postArticleExplanation = async (req, res, next) => {
             Provide a kind and concise explanation in only 1 or 2 sentences so that it is easy for the user to understand. 
             Please respond in English.
         `;
+        
+        const prompt = `
+            You are an expert in news media analysis.
+
+            Article Title: "${title}"
+            Article Content: "${content}"
+            Political Bias Label of this Article: "${label}"
+
+            Please analyze why this article was identified as having this political orientation within this context. 
+
+            Your explanation must incorporate the following point: 
+            this article focuses on the failures of a Democratic president's signature policy, a framing commonly used by conservative media.
+
+            Provide a kind and concise explanation in only 1 or 2 sentences so that it is easy for the user to understand. 
+            Please respond in English.
+        `;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
-        res.json({ explanation: text });
+        res.json({ explanation: text });*/
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         
-        /*
         const mockData = {
-            explanation: `
-            The term "strategic competitor" is considered a biased keyword because it reframes the U.S.-China relationship from one of diplomatic cooperation to one of direct rivalry and threat, reflecting a hawkish, right-leaning foreign policy.
-            This specific wording is used to justify "America First" agendas and aggressive measures in trade and national security, intentionally contrasting with the more moderate and welcoming language used by previous administrations.`
+            explanation: `This article was judged to be biased toward the right because it focuses on the failures of a Democratic president's signature policy, a framing commonly used by conservative media.`
         };
         
         res.json(mockData);
-        */
+        
 
         
         

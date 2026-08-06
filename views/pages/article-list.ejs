@@ -252,55 +252,40 @@
 
         <div class="bg-card-light dark:bg-card-dark px-6 pt-3 pb-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
             <h3 class="text-lg font-bold mb-3 text-text-light dark:text-text-dark">Political Bias in My Feed</h3>
-            
+
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-xl h-14 overflow-hidden flex text-white text-xs font-bold shadow-inner">
-                
-                <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.recommend.Left %>%">
-                    <% if (stats.recommend.Left > 5) { %> 
-                        <span>Left</span>
-                        <span><%= stats.recommend.Left %>%</span>
-                    <% } %>
+
+                <div class="flex flex-col items-center justify-center bg-pol-left border-r border-white/20 transition-all duration-500"
+                    style="width: 5%">
+                    <span>Left</span>
+                    <span>5%</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.recommend.LeanLeft %>%">
-                    <% if (stats.recommend.LeanLeft > 5) { %> 
-                        <span>Lean Left</span>
-                        <span><%= stats.recommend.LeanLeft %>%</span>
-                    <% } %>
+                <div class="flex flex-col items-center justify-center bg-pol-lean-left border-r border-white/20 transition-all duration-500"
+                    style="width: 10%">
+                    <span>Lean Left</span>
+                    <span>10%</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500" 
-                    style="width: <%= stats.recommend.Center %>%">
-                    <% if (stats.recommend.Center > 5) { %>
-                        <span>Center</span>
-                        <span><%= stats.recommend.Center %>%</span>
-                    <% } %>
+                <div class="flex flex-col items-center justify-center bg-pol-center border-r border-white/20 transition-all duration-500"
+                    style="width: 10%">
+                    <span>Center</span>
+                    <span>10%</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500" 
-                    style="width: <%= stats.recommend.LeanRight %>%">
-                    <% if (stats.recommend.LeanRight > 5) { %>
-                        <span>Lean Right</span>
-                        <span><%= stats.recommend.LeanRight %>%</span>
-                    <% } %>
+                <div class="flex flex-col items-center justify-center bg-pol-lean-right transition-all duration-500"
+                    style="width: 25%">
+                    <span>Lean Right</span>
+                    <span>25%</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500" 
-                    style="width: <%= stats.recommend.Right %>%">
-                    <% if (stats.recommend.Right > 5) { %>
-                        <span>Right</span>
-                        <span><%= stats.recommend.Right %>%</span>
-                    <% } %>
+                <div class="flex flex-col items-center justify-center bg-pol-right transition-all duration-500"
+                    style="width: 50%">
+                    <span>Right</span>
+                    <span>50%</span>
                 </div>
 
             </div>
-
-            <% if (stats.recommend.Left === 0 && stats.recommend.LeanLeft === 0 && 
-            stats.recommend.Center === 0 && stats.recommend.LeanRight === 0 && stats.recommend.Right === 0) { %>
-                <p class="text-[10px] text-center mt-2 text-subtext-light">no data</p>
-            <% } %>
         </div>
 
         
