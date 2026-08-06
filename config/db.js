@@ -10,7 +10,10 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT || 3306, // MySQL 기본 포트는 3306입니다.
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 module.exports = {
