@@ -36,6 +36,19 @@ app.use((req, res, next) => {
     next();
 });
 
+//발표용 상시 로그인기능
+app.use((req, res, next) => {
+    // 세션에 발표용 사용자 정보 강제 할당
+    req.session.userId = 'right';
+    req.session.user = {
+        id: 'right',
+        name: '발표용 계정'
+    };
+    
+    res.locals.session = req.session;
+    next();
+});
+
 
 app.use('/', routes);
 
